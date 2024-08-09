@@ -7,6 +7,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.bluetooths.R;
+import com.android.bluetooths.database.DbManager;
+import com.android.bluetooths.database.LocationDao;
+import com.android.bluetooths.database.LocationData;
+import com.android.bluetooths.database.RoomDB;
+import com.android.bluetooths.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +21,11 @@ public class MainActivity extends BaseActivity {
 
 
     private RecyclerView mRecycleView;
-    private CoordinateAdapter mAdapter;//适配器
-    private LinearLayoutManager mLinearLayoutManager;//布局管理器
-    private ArrayList<String> mList;
+    private CoordinateAdapter mAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
+    private ArrayList<LocationData> mList;
+
+    private LocationDao LocDao = DbManager.INSTANCE.getDb().LocationDao();;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,22 +33,45 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.main);
 
         mList = new ArrayList<>();
-        initData(mList);
+        //initData(mList);
 
         mRecycleView = findViewById(R.id.recycler_view);
 
         mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        mAdapter = new CoordinateAdapter(mList);
+        ArrayList<LocationData> data =  (ArrayList<LocationData>)LocDao.queryAll();
+        mAdapter = new CoordinateAdapter(data, LocDao);
         mRecycleView.setAdapter(mAdapter);
+
 
 
     }
 
-    public void initData(ArrayList<String> list) {
-        for (int i = 1; i <= 40; i++) {
-            list.add("第" + i + "条数据");
+    public void initData(ArrayList<LocationData> list) {
+        for (int i = 11; i <= 20; i++) {
+            String name = "第" + i + "条数据";
+            Double la = 11.22222;
+            Double lu = 333.4444;
+
+            LocationData ld = new LocationData(name, la, lu);
+            LocDao.addLocation(ld);
         }
+    }
+
+    private void insert() {
+        String name = "啊啊啊";
+        Double la = 11.22222;
+        Double lu = 333.4444;
+
+        LocationData ld = new LocationData(name, la, lu);
+
+        LocDao.addLocation(ld);
+    }
+
+    private void q() {
+        LocationData aaa = LocDao.queryAll().get(0);
+        String ss = aaa.toString();
+        Util.DisplayToast(this, ss);
     }
 
 }
