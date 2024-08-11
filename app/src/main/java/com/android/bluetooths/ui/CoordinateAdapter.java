@@ -14,9 +14,8 @@ import com.android.bluetooths.database.LocationData;
 import com.android.bluetooths.utils.Util;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class CoordinateAdapter extends RecyclerView.Adapter<CoordinateAdapter.Holder> {
+public class CoordinateAdapter extends RecyclerView.Adapter<CoordinateAdapter.CoordinateViewHolder> {
 
 
     private ArrayList<LocationData> mList;
@@ -30,15 +29,15 @@ public class CoordinateAdapter extends RecyclerView.Adapter<CoordinateAdapter.Ho
 
     @NonNull
     @Override
-    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CoordinateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.coordinate_adapter,parent,false);
-        Holder holder = new Holder(view);
+                .inflate(R.layout.adapter_coordinate,parent,false);
+        CoordinateViewHolder holder = new CoordinateViewHolder(view);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull CoordinateViewHolder holder, int position) {
         holder.textView.setText(mList.get(position).toString());
         int ps = position;
         LocationData ld = mList.get(position);
@@ -62,9 +61,9 @@ public class CoordinateAdapter extends RecyclerView.Adapter<CoordinateAdapter.Ho
         return mList.size();
     }
 
-    static class Holder extends RecyclerView.ViewHolder {
+    static class CoordinateViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
-        public Holder(@NonNull View itemView) {
+        public CoordinateViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.tv_content);
         }

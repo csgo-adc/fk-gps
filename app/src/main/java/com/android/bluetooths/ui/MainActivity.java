@@ -1,5 +1,6 @@
 package com.android.bluetooths.ui;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,11 +11,9 @@ import com.android.bluetooths.R;
 import com.android.bluetooths.database.DbManager;
 import com.android.bluetooths.database.LocationDao;
 import com.android.bluetooths.database.LocationData;
-import com.android.bluetooths.database.RoomDB;
 import com.android.bluetooths.utils.Util;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends BaseActivity {
@@ -31,6 +30,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+
 
         mList = new ArrayList<>();
         //initData(mList);
