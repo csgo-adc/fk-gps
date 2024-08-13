@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = "com.android.bluetooths"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -98,6 +98,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.exoplayer:extension-okhttp:2.19.1")
 
     //baidu map
     implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.6.2")

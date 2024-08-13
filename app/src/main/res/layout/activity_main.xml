@@ -17,7 +17,7 @@
             android:id="@+id/set"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="30dp"
             app:layout_constraintBottom_toTopOf="@+id/history_lin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/chartreuse"
                 android:gravity="center"
-                android:text="@string/history_location"
+                android:text="@string/history_tele_location"
                 android:textColor="@color/purple"
                 android:textSize="25sp" />
 

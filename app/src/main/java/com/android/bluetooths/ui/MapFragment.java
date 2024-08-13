@@ -1,30 +1,37 @@
 package com.android.bluetooths.ui;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.android.bluetooths.R;
+import com.android.bluetooths.database.DbManager;
+import com.android.bluetooths.database.LocationDao;
+import com.android.bluetooths.database.LocationData;
+import com.android.bluetooths.databinding.FragmentMapBinding;
+import com.android.bluetooths.service.LocService;
+import com.android.bluetooths.utils.MapUtils;
+import com.android.bluetooths.utils.PermissionUtils;
 import com.android.bluetooths.utils.Util;
+import com.android.bluetooths.viewmodel.SearchViewModel;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
@@ -50,42 +57,38 @@ import com.baidu.mapapi.search.aoi.AoiSearchOption;
 import com.baidu.mapapi.search.aoi.OnGetAoiSearchResultListener;
 import com.baidu.mapapi.search.core.AoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
-import com.baidu.mapapi.search.sug.SuggestionResult;
-import com.baidu.mapapi.search.sug.SuggestionSearch;
-import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MapFragment extends Fragment {
 
 
-    private static String ARG_PARAM = "param_key";
-
-    private String mParam;
     private Activity mActivity;
+    private LocService.ServiceBinder mServiceBinder;
+    private ServiceConnection mConnection;
+
+    private SearchViewModel searchViewModel;
 
     private MapView mMapView;
-    private TextView mTextView;
     private BaiduMap mBaiduMap;
-
-    private float mCurrentAccracy;
-
     private AoiSearch mSearch;
-
     private LocationClient mLocClient;
-    private SuggestionSearch mSuggestionSearch = null;
     private MyLocationData myLocationData;
 
-    public static String mCurrentCity = null;
-
+    private boolean isNeedLocation = true;
+    private boolean isMockServStart = false;
+    private String mCurrentCity = null;
     private double mCurrentLat = 0.0;       // 当前位置的百度纬度
     private double mCurrentLon = 0.0;       // 当前位置的百度经度
     private float mCurrentDirection = 0.0f;
     private boolean isFirstLoc = true; // 是否首次定位
-    private static LatLng mMarkLatLngMap = new LatLng(16.547743718042415, 117.07018449827267); // 当前标记的地图点
+
+    private boolean isMarked = false;
+    private static LatLng mMarkLatLngMap = new LatLng(40.070754, 116.324175); // 当前标记的地图点
+    private double mAltitude = 250.0; //海拔随便写的
+
+    private LocationDao LocDao = DbManager.INSTANCE.getDb().LocationDao();
 
 
     @Override
@@ -97,48 +100,117 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("baidu", "onCreate");
 
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
-        mMapView = view.findViewById(R.id.bmapView);
-        mTextView = view.findViewById(R.id.wacc);
+        Log.e("baidu", "onCreateView");
 
-        return view;
+        FragmentMapBinding dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
+
+        mMapView = dataBinding.bmapView;
+
+        dataBinding.setClickListener(new ClickListener());
+
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mServiceBinder = (LocService.ServiceBinder) service;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        return dataBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Log.e("baidu", "onViewCreated");
 
         initMap();
-
         initSearch();
+
         Bundle bundle = getArguments();
         if (bundle != null) {
-            double latitude = Double.parseDouble(bundle.getString("latitude"));
-            double longitude = Double.parseDouble(bundle.getString("longitude"));
-
+            double latitude = bundle.getDouble(MainActivity.LAT_VALUE);
+            double longitude = bundle.getDouble(MainActivity.LNG_VALUE);
             LatLng latLng = new LatLng(latitude, longitude);
+
+            isNeedLocation = false;
+
             doSearch(latLng);
 
         }
+        if (isNeedLocation) {
+            initMapLocation();
+
+        }
+
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mServiceBinder = (LocService.ServiceBinder) service;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
 
     }
+
+    @Override
+    public void onResume() {
+        Log.e("baidu", "onResume");
+
+        super.onResume();
+        mMapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        Log.e("baidu", "onPause");
+
+        super.onPause();
+        mMapView.onPause();
+    }
+
 
     @Override
     public void onStart() {
         super.onStart();
-        initMapLocation();
+
+
+        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
 
     }
 
     @Override
+    public void onStop() {
+
+        super.onStop();
+    }
+
+    @Override
     public void onDestroy() {
+
         super.onDestroy();
+        if (mLocClient != null) {
+            mLocClient.stop();
+        }
+        mBaiduMap.setMyLocationEnabled(false);
         mMapView.onDestroy();
+        mMapView = null;
+        mSearch.destroy();
     }
 
     private void initMap() {
@@ -183,8 +255,6 @@ public class MapFragment extends Fragment {
             mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
                 @Override
                 public void onMapLoaded() {
-                    Log.e("aaaaa", "onMapLoaded");
-
                     mBaiduMap.setMyLocationEnabled(true);
                     mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
                 }
@@ -194,13 +264,15 @@ public class MapFragment extends Fragment {
             mLocClient.registerLocationListener(new BDAbstractLocationListener() {
                 @Override
                 public void onReceiveLocation(BDLocation location) {
-                    Log.e("baidu", "定位了啊啊啊啊啊啊啊啊");
                     if (location == null || mMapView == null) {
                         return;
                     }
                     mCurrentLat = location.getLatitude();
                     mCurrentLon = location.getLongitude();
-                    mCurrentAccracy = location.getRadius();
+
+                    mCurrentCity = location.getCity();
+
+
                     myLocationData = new MyLocationData.Builder()
                             .accuracy(location.getRadius())// 设置定位数据的精度信息，单位：米
                             .direction(mCurrentDirection)// 此处设置开发者获取到的方向信息，顺时针0-360
@@ -209,6 +281,7 @@ public class MapFragment extends Fragment {
                             .build();
                     mBaiduMap.setMyLocationData(myLocationData);
                     if (isFirstLoc) {
+                        searchViewModel.setCity(mCurrentCity);
                         isFirstLoc = false;
                         LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
                         MapStatus.Builder builder = new MapStatus.Builder();
@@ -229,7 +302,6 @@ public class MapFragment extends Fragment {
                  */
                 @Override
                 public void onLocDiagnosticMessage(int locType, int diagnosticType, String diagnosticMessage) {
-                    Log.e("baidu", "定位了ccccccccccc");
                 }
             });
             LocationClientOption locationOption = getLocationClientOption();
@@ -239,7 +311,6 @@ public class MapFragment extends Fragment {
             mLocClient.start();
         } catch (Exception e) {
             Log.e("baidu", e.toString());
-            Log.e("baidu", "定位了eeeeeeeeeeeeeeeee");
         }
     }
 
@@ -267,7 +338,7 @@ public class MapFragment extends Fragment {
                     String polygon = aoiInfo.getPolygon();
                     PolygonOptions polygonOptions = new PolygonOptions();
                     polygonOptions.points(polygon, EncodePointType.AOI);
-                    polygonOptions.stroke(new Stroke(5, Color.argb(255, 0, 150, 150)));// 设置多边形边框信息
+                    polygonOptions.stroke(new Stroke(5, Color.argb(155, 155, 150, 150)));// 设置多边形边框信息
                     polygonOptions.fillColor(Color.argb(100, 110, 160, 0));// 设置多边形填充颜色
                     mBaiduMap.addOverlay(polygonOptions);
 
@@ -275,23 +346,11 @@ public class MapFragment extends Fragment {
                     if (latLngBounds != null) {
                         boundsBuilder.include(latLngBounds.northeast).include(latLngBounds.southwest);
                     }
-
-                    Log.e("TAG ", "onGetAoiResult: " + aoiInfo.getNearestDistance());
-                    Log.e("TAG ", "onGetAoiResult: " + polygon);
                 }
                 mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100, 100, 100, 100));
             }
         });
 
-        mTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LatLng ptCenter = new LatLng(25.070754, 116.324175);
-
-                doSearch(ptCenter);
-
-            }
-        });
 
     }
 
@@ -301,7 +360,10 @@ public class MapFragment extends Fragment {
         latLngs.add(latLng);
         aoiSearchOption.setLatLngList(latLngs);
 
+
         mSearch.requestAoi(aoiSearchOption);
+
+        markMap(latLng);
     }
 
     private static LocationClientOption getLocationClientOption() {
@@ -336,7 +398,8 @@ public class MapFragment extends Fragment {
 
 
     private void markMap(LatLng latLng) {
-        //LatLng point = new LatLng(39.963175, 116.400244);
+        mMarkLatLngMap = latLng;
+        isMarked = true;
         BitmapDescriptor bitmap = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_mark);
         OverlayOptions option = new MarkerOptions()
@@ -349,7 +412,7 @@ public class MapFragment extends Fragment {
     private void resetMap() {
         mBaiduMap.clear();
         mMarkLatLngMap = null;
-
+        isMarked = false;
         MyLocationData locData = new MyLocationData.Builder()
                 .latitude(mCurrentLat)
                 .longitude(mCurrentLon)
@@ -361,4 +424,61 @@ public class MapFragment extends Fragment {
         builder.target(new LatLng(mCurrentLat, mCurrentLon)).zoom(18.0f);
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
     }
+
+    public class ClickListener {
+        public void onSendClick() {
+            if (!PermissionUtils.isAllowMockLocation(mActivity)) {
+                PermissionUtils.showEnableMockLocationDialog(mActivity);
+                Util.DisplayToast(mActivity, "模拟位置没打开");
+                return;
+            }
+//            if (!PermissionUtils.isGpsOpened(mActivity)) {
+//                Util.DisplayToast(mActivity, "Gps 坏了");
+//                return;
+//            }
+
+            if (!PermissionUtils.isNetworkAvailable(mActivity)) {
+                Util.DisplayToast(mActivity, "network 坏了");
+                return;
+            }
+            if (!Settings.canDrawOverlays(mActivity.getApplicationContext())) {
+                PermissionUtils.showEnableFloatWindowDialog(getActivity());
+                return;
+            }
+
+            startGoLocation();
+
+        }
+    }
+
+
+    private void startGoLocation() {
+        if (!isMarked || mMarkLatLngMap == null) {
+            Util.DisplayToast(mActivity, "请标记传送地点");
+            return;
+        }
+        LocationData data = new LocationData("地点", mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+        LocDao.addLocation(data);
+        if (isMockServStart) {
+
+
+            double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+
+            mServiceBinder.setPosition(latLng[0], latLng[1], mAltitude);
+            resetMap();
+
+        } else {
+
+            Intent intent = new Intent(mActivity, LocService.class);
+            mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);    // 绑定服务和活动，之后活动就可以去调服务的方法了
+            double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+            intent.putExtra(MainActivity.LAT_VALUE, latLng[0]);
+            intent.putExtra(MainActivity.LNG_VALUE, latLng[1]);
+            intent.putExtra(MainActivity.ALT_VALUE, mAltitude);
+
+            mActivity.startForegroundService(intent);
+            isMockServStart = true;
+        }
+    }
+
 }

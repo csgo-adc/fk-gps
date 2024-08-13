@@ -69,7 +69,7 @@ public class PermissionUtils {
     }
 
     //判断GPS是否打开
-    public static  boolean isGpsOpened(Context context) {
+    public static boolean isGpsOpened(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
@@ -121,21 +121,10 @@ public class PermissionUtils {
 
             // 模拟位置可用
             if (canMockPosition) {
-                Location location = new Location(LocationManager.GPS_PROVIDER);
-                location.setLatitude(37.4219999);
-                location.setLongitude(-122.0840575);
-                location.setAccuracy(Criteria.ACCURACY_FINE);    // 设定此位置的估计水平精度，以米为单位。
-                location.setAltitude(55.0D);                     // 设置高度，在 WGS 84 参考坐标系中的米
-                location.setBearing(0.0F);                       // 方向（度）
-                   // 经度（度）
-                location.setTime(System.currentTimeMillis());    // 本地时间
-                location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
 
                 // remove test provider
                 locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, false);
-                locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, location);
-
-                Log.d("aaaa", "gogogog");
+                locationManager.removeTestProvider(LocationManager.GPS_PROVIDER);
 
 
             }
@@ -147,11 +136,11 @@ public class PermissionUtils {
     }
 
     //提醒开启位置模拟的弹框
-    public static  void showEnableMockLocationDialog(Context context) {
+    public static void showEnableMockLocationDialog(Context context) {
         new AlertDialog.Builder(context)
                 .setTitle("启用位置模拟")//这里是表头的内容
                 .setMessage("请在\"开发者选项→选择模拟位置信息应用\"中进行设置")//这里是中间显示的具体信息
-                .setPositiveButton("设置",(dialog, which) -> {
+                .setPositiveButton("设置", (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -160,17 +149,17 @@ public class PermissionUtils {
                         e.printStackTrace();
                     }
                 })
-                .setNegativeButton("取消",(dialog, which) -> {
+                .setNegativeButton("取消", (dialog, which) -> {
                 })
                 .show();
     }
 
     //提醒开启悬浮窗的弹框
-    public static  void showEnableFloatWindowDialog(Context context) {
+    public static void showEnableFloatWindowDialog(Context context) {
         new AlertDialog.Builder(context)
                 .setTitle("启用悬浮窗")//这里是表头的内容
                 .setMessage("为了模拟定位的稳定性，建议开启\"显示悬浮窗\"选项")//这里是中间显示的具体信息
-                .setPositiveButton("设置",(dialog, which) -> {
+                .setPositiveButton("设置", (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -186,11 +175,11 @@ public class PermissionUtils {
     }
 
     //显示开启GPS的提示
-    public static  void showEnableGpsDialog(Context context) {
+    public static void showEnableGpsDialog(Context context) {
         new AlertDialog.Builder(context)
                 .setTitle("启用定位服务")//这里是表头的内容
                 .setMessage("是否开启 GPS 定位服务?")//这里是中间显示的具体信息
-                .setPositiveButton("确定",(dialog, which) -> {
+                .setPositiveButton("确定", (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         context.startActivity(intent);
@@ -198,7 +187,7 @@ public class PermissionUtils {
                         e.printStackTrace();
                     }
                 })
-                .setNegativeButton("取消",(dialog, which) -> {
+                .setNegativeButton("取消", (dialog, which) -> {
 
                 })
                 .show();
