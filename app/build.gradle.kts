@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.cli.jvm.main
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -41,6 +43,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        ndk {
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi", "armeabi-v7a", "x86", "x86_64"))
+        }
 
     }
 
@@ -67,6 +72,7 @@ android {
     }
     buildFeatures {
         compose = true
+        dataBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -93,19 +99,22 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.appcompat:appcompat:1.7.0")
 
-
     //baidu map
     implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.6.2")
     implementation("com.baidu.lbsyun:BaiduMapSDK_Search:7.6.2")
-    implementation("com.baidu.lbsyun:BaiduMapSDK_Location:9.6.4")
+    implementation("com.baidu.lbsyun:BaiduMapSDK_Location_All:9.6.4")
     implementation("com.baidu.lbsyun:BaiduMapSDK_Util:7.6.2")
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+
+    //nav
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.navigation:navigation-ui:2.7.7")
+
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -114,4 +123,10 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }

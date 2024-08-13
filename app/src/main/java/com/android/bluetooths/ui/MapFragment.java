@@ -24,6 +24,7 @@ import com.android.bluetooths.R;
 import com.android.bluetooths.utils.Util;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
@@ -113,7 +114,6 @@ public class MapFragment extends Fragment {
 
 
         initMap();
-        initMapLocation();
 
         initSearch();
         Bundle bundle = getArguments();
@@ -128,6 +128,18 @@ public class MapFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        initMapLocation();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
+    }
 
     private void initMap() {
 
@@ -135,12 +147,10 @@ public class MapFragment extends Fragment {
 
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
 
-
         mBaiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
                 markMap(latLng);
-
             }
 
             @Override
@@ -158,7 +168,6 @@ public class MapFragment extends Fragment {
         try {
             // 定位初始化
             mLocClient = new LocationClient(mActivity);
-            mBaiduMap.setMyLocationEnabled(true);
             BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_blue);
             //导航箭头
             BitmapDescriptor arrow = BitmapDescriptorFactory.fromResource(R.drawable.icon_arrow);
@@ -168,17 +177,24 @@ public class MapFragment extends Fragment {
                     .setAnimation(true).setMarkerRotation(false)
                     .build();
 
+            mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
+
+
             mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
                 @Override
                 public void onMapLoaded() {
+                    Log.e("aaaaa", "onMapLoaded");
+
                     mBaiduMap.setMyLocationEnabled(true);
                     mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
                 }
             });
+
+
             mLocClient.registerLocationListener(new BDAbstractLocationListener() {
                 @Override
                 public void onReceiveLocation(BDLocation location) {
-
+                    Log.e("baidu", "定位了啊啊啊啊啊啊啊啊");
                     if (location == null || mMapView == null) {
                         return;
                     }
@@ -213,6 +229,7 @@ public class MapFragment extends Fragment {
                  */
                 @Override
                 public void onLocDiagnosticMessage(int locType, int diagnosticType, String diagnosticMessage) {
+                    Log.e("baidu", "定位了ccccccccccc");
                 }
             });
             LocationClientOption locationOption = getLocationClientOption();
@@ -221,7 +238,8 @@ public class MapFragment extends Fragment {
             //开始定位
             mLocClient.start();
         } catch (Exception e) {
-            Log.e("main", e.toString());
+            Log.e("baidu", e.toString());
+            Log.e("baidu", "定位了eeeeeeeeeeeeeeeee");
         }
     }
 

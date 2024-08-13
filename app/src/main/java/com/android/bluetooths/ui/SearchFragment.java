@@ -17,6 +17,9 @@ import android.widget.SimpleAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,27 +27,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.bluetooths.R;
 import com.android.bluetooths.utils.Util;
+import com.android.bluetooths.viewmodel.SearchViewModel;
+import com.android.bluetooths.viewmodel.Searcher;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
 
-    private String mParam;
     private Activity mActivity;
 
-    public SuggestionSearch mSuggestionSearch;
+    private SuggestionSearch mSuggestionSearch;
     private RecyclerView mSugListView;
     private SearchResultAdapter mAdapter;
-
-
-    private EditText mEditCity = null;
-    private AutoCompleteTextView mKeyWordsView = null;
 
 
     @Override
@@ -55,11 +56,9 @@ public class SearchFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_search, container, false);
-        mSugListView = root.findViewById(R.id.sug_list);
-        mEditCity = mActivity.findViewById(R.id.city);
-        mKeyWordsView = mActivity.findViewById(R.id.searchkey);
-        return root;
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        mSugListView = view.findViewById(R.id.sug_list);
+        return view;
     }
 
 
@@ -67,6 +66,26 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initSearch();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        final SearchViewModel searchViewModel = new ViewModelProvider((ViewModelStoreOwner) mActivity,
+                new ViewModelProvider.AndroidViewModelFactory(mActivity.getApplication())).get(SearchViewModel.class);
+        searchViewModel.searcherMutableLiveData.observe(this, new Observer<Searcher>() {
+            @Override
+            public void onChanged(Searcher searcher) {
+                doSearch(searcher.getCity(), searcher.getKeyword());
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSuggestionSearch.destroy();
     }
 
     private void initSearch() {
@@ -99,10 +118,17 @@ public class SearchFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
+    }
 
+    private void doSearch(String city, String keyword) {
+        SuggestionSearchOption option = new SuggestionSearchOption();
+        WeakReference<SuggestionSearchOption> weakReference = new WeakReference<>(option);
 
+        SuggestionSearchOption s = weakReference.get();
+        s.city(city);
+        s.keyword(keyword);
 
-
+        mSuggestionSearch.requestSuggestion(s);
 
     }
 

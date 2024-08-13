@@ -10,22 +10,17 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.android.bluetooths.R;
 
-import com.baidu.mapapi.map.Overlay;
-import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.android.bluetooths.viewmodel.SearchViewModel;
 
 
 public class LocationActivity extends BaseActivity {
@@ -47,6 +42,11 @@ public class LocationActivity extends BaseActivity {
         NavController navController = navHostFragment.getNavController();
 
 
+        final SearchViewModel searchViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(SearchViewModel.class);
+
+
+
         mKeyWordsView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -62,34 +62,28 @@ public class LocationActivity extends BaseActivity {
         mKeyWordsView.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable arg0) {
+
             }
 
             @Override
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+
             }
 
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-
 
                 if (cs.length() <= 0) {
                     return;
                 }
 
                 int currentFragmentId = navController.getCurrentDestination().getId();
-
                 if (currentFragmentId != R.id.search_Fragment) {
                     navController.navigate(R.id.search_Fragment);
-                    SearchFragment searchFragment = (SearchFragment) navHostFragment.getChildFragmentManager().getFragments().get(0);
-
-                    searchFragment.mSuggestionSearch.requestSuggestion((new SuggestionSearchOption())
-                            .keyword(cs.toString()) // 关键字
-                            .city(mEditCity.getText().toString())); // 城市
-
                 }
+                searchViewModel.input(mEditCity.getText().toString(), cs.toString());
+
             }
-
-
 
         });
 

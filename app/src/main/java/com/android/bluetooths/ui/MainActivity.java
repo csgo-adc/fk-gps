@@ -1,16 +1,29 @@
 package com.android.bluetooths.ui;
 
-import android.app.FragmentManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.bluetooths.R;
+import com.android.bluetooths.SuspendwindowService;
 import com.android.bluetooths.database.DbManager;
 import com.android.bluetooths.database.LocationDao;
 import com.android.bluetooths.database.LocationData;
+import com.android.bluetooths.databinding.ActivityMainBinding;
+import com.android.bluetooths.service.LocService;
+import com.android.bluetooths.utils.PermissionUtils;
 import com.android.bluetooths.utils.Util;
 
 import java.util.ArrayList;
@@ -24,29 +37,77 @@ public class MainActivity extends BaseActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private ArrayList<LocationData> mList;
 
-    private LocationDao LocDao = DbManager.INSTANCE.getDb().LocationDao();;
+    private LocationDao LocDao = DbManager.INSTANCE.getDb().LocationDao();
+    private LocService.ServiceBinder mServiceBinder;
+    private ServiceConnection mConnection;
+
+
+    private Context mContext;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
 
+
+        ActivityMainBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        dataBinding.setClickListener(new ClickListener());
 
 
         mList = new ArrayList<>();
         //initData(mList);
 
-        mRecycleView = findViewById(R.id.recycler_view);
+        mRecycleView = dataBinding.recyclerView;
 
-        mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
+        mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        ArrayList<LocationData> data =  (ArrayList<LocationData>)LocDao.queryAll();
+        ArrayList<LocationData> data = (ArrayList<LocationData>) LocDao.queryAll();
         mAdapter = new CoordinateAdapter(data, LocDao);
         mRecycleView.setAdapter(mAdapter);
 
 
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mServiceBinder = (LocService.ServiceBinder)service;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
 
     }
+
+    public class ClickListener {
+        public void onMapClick() {
+            startActivity(new Intent(MainActivity.this, LocationActivity.class));
+        }
+
+        public void onTeleportClick() {
+
+            if (!PermissionUtils.isNetworkConnected(MainActivity.this)) {
+                Util.DisplayToast(getApplicationContext(), "no network");
+            }
+
+            if (!PermissionUtils.isGpsOpened(MainActivity.this)) {
+                Util.DisplayToast(getApplicationContext(), "no GPS");
+            }
+
+            Intent serviceIntent = new Intent(MainActivity.this, LocService.class);
+
+            bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            }
+
+        }
+
+}
+
 
     public void initData(ArrayList<LocationData> list) {
         for (int i = 11; i <= 20; i++) {
@@ -74,5 +135,6 @@ public class MainActivity extends BaseActivity {
         String ss = aaa.toString();
         Util.DisplayToast(this, ss);
     }
+
 
 }

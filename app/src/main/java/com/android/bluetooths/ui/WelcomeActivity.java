@@ -34,7 +34,8 @@ public class WelcomeActivity extends BaseActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_PHONE_STATE
         };
         List<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions) {
@@ -74,7 +75,7 @@ public class WelcomeActivity extends BaseActivity {
     private void proceedToMain() {
         // 权限授予后停留2秒并跳转到主页面
         new Handler().postDelayed(() -> {
-            startActivity(new Intent(WelcomeActivity.this, LocationActivity.class));
+            startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
             finish();
         }, 1000); // 2秒
     }
