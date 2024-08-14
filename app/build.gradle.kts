@@ -29,11 +29,11 @@ android {
         }
 
     }
-    namespace = "com.android.bluetooths"
+    namespace = "com.android.nfc.system"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.bluetooths"
+        applicationId = "com.android.nfc.system"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -61,6 +61,12 @@ android {
 
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+    applicationVariants.all {
+        outputs.all {
+            val outputFileName = "LocationAssistant-${versionName}-${buildType.name}.apk"
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = outputFileName
         }
     }
     compileOptions {

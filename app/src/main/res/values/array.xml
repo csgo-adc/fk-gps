@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinnerclass">
+        <item>普通地图</item>
+        <item>卫星地图</item>
+        <item>空白地图</item>
+    </string-array>
+</resources>

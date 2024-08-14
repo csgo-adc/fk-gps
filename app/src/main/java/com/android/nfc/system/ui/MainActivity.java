@@ -1,27 +1,30 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.bluetooths.R;
-import com.android.bluetooths.adapter.CoordinateAdapter;
-import com.android.bluetooths.database.DbManager;
-import com.android.bluetooths.database.LocationDao;
-import com.android.bluetooths.database.LocationData;
-import com.android.bluetooths.databinding.ActivityMainBinding;
-import com.android.bluetooths.utils.PermissionUtils;
-import com.android.bluetooths.utils.Util;
+import com.android.nfc.system.R;
+import com.android.nfc.system.adapter.CoordinateAdapter;
+import com.android.nfc.system.database.DbManager;
+import com.android.nfc.system.database.LocationDao;
+import com.android.nfc.system.database.LocationData;
+import com.android.nfc.system.databinding.ActivityMainBinding;
+import com.android.nfc.system.utils.PermissionUtils;
+import com.android.nfc.system.utils.Util;
 
 import java.util.ArrayList;
 
@@ -29,7 +32,7 @@ import java.util.ArrayList;
 public class MainActivity extends BaseActivity {
 
     public static final String LAT_VALUE = "LAT_VALUE";
-    public static final String LNG_VALUE = "LON_VALUE";
+    public static final String LON_VALUE = "LON_VALUE";
     public static final String ALT_VALUE = "ALT_VALUE";
 
     private RecyclerView mRecycleView;
@@ -64,6 +67,7 @@ public class MainActivity extends BaseActivity {
         ArrayList<LocationData> data = (ArrayList<LocationData>) LocDao.queryAll();
         mAdapter = new CoordinateAdapter(data);
         mRecycleView.setAdapter(mAdapter);
+        mRecycleView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -75,6 +79,7 @@ public class MainActivity extends BaseActivity {
 
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onItemLongClick(View view, int position) {
                 showDeleteDialog(MainActivity.this, data, position);
@@ -83,21 +88,42 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint({"NotifyDataSetChanged", "ResourceType"})
     private void showDeleteDialog(Context context, ArrayList<LocationData> data, int position) {
-        new AlertDialog.Builder(context)
-                .setTitle("确定要删除本条数据吗")//这里是表头的内容
-                .setPositiveButton("确定", (dialog, which) -> {
-                    try {
-                        LocationData ld = data.get(position);
-                        LocDao.deleteLocation(ld);
-                        data.remove(position);
-                        mAdapter.notifyDataSetChanged();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        final EditText input = new EditText(context);
+        input.setHint(getResources().getString(R.string.rename));
+        input.setText(data.get(position).getPositionName());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+
+        dialog.setView(input)
+                .setTitle("请选择")
+                .setPositiveButton("删除数据", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            LocationData ld = data.get(position);
+                            LocDao.deleteLocation(ld);
+                            data.remove(position);
+                            mAdapter.notifyDataSetChanged();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 })
-                .setNegativeButton("取消", (dialog, which) -> {
+                .setNegativeButton("修改地点名称", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        LocationData ld = data.get(position);
+                        ld.setPositionName(input.getText().toString());
+                        LocDao.updateLocation(ld);
+                        mAdapter.notifyDataSetChanged();
+                    }
                 })
                 .show();
     }
@@ -110,11 +136,12 @@ public class MainActivity extends BaseActivity {
         public void onTeleportClick() {
 
             if (!checkEditTvEmpty()) {
-                Util.DisplayToast(MainActivity.this,"请输入经纬度");
+                Util.DisplayToast(MainActivity.this, "请输入经纬度");
                 return;
             }
-            mLat = Double.valueOf(latEdit.getText().toString());
             mLon = Double.valueOf(lonEdit.getText().toString());
+
+            mLat = Double.valueOf(latEdit.getText().toString());
 
             if (!PermissionUtils.isNetworkConnected(MainActivity.this)) {
                 Util.DisplayToast(getApplicationContext(), "no network");
@@ -126,8 +153,8 @@ public class MainActivity extends BaseActivity {
 
             Intent intent = new Intent(MainActivity.this, LocationActivity.class);
             Bundle bundle = new Bundle();
+            bundle.putDouble(LON_VALUE, mLon);
             bundle.putDouble(LAT_VALUE, mLat);
-            bundle.putDouble(LNG_VALUE, mLon);
             intent.putExtra("Loc", bundle);
             startActivity(intent);
 
@@ -138,34 +165,6 @@ public class MainActivity extends BaseActivity {
 
     private boolean checkEditTvEmpty() {
         return !TextUtils.isEmpty(latEdit.getText().toString()) && !TextUtils.isEmpty(lonEdit.getText().toString());
-    }
-
-
-    public void initData(ArrayList<LocationData> list) {
-        for (int i = 11; i <= 20; i++) {
-            String name = "第" + i + "条数据";
-            Double la = 11.22222;
-            Double lu = 333.4444;
-
-            LocationData ld = new LocationData(name, la, lu);
-            LocDao.addLocation(ld);
-        }
-    }
-
-    private void insert() {
-        String name = "啊啊啊";
-        Double la = 11.22222;
-        Double lu = 333.4444;
-
-        LocationData ld = new LocationData(name, la, lu);
-
-        LocDao.addLocation(ld);
-    }
-
-    private void q() {
-        LocationData aaa = LocDao.queryAll().get(0);
-        String ss = aaa.toString();
-        Util.DisplayToast(this, ss);
     }
 
 

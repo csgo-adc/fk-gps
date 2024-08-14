@@ -1,4 +1,4 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
 import com.baidu.location.LocationClient;
 import com.baidu.mapapi.CoordType;

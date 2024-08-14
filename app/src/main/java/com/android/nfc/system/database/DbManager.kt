@@ -1,9 +1,9 @@
-package com.android.bluetooths.database
+package com.android.nfc.system.database
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.android.bluetooths.ui.Application
+import com.android.nfc.system.ui.Application
 
 object DbManager {
 

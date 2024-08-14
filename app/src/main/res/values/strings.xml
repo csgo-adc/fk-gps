@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">lolo</string>
+    <string name="app_name">定位助手</string>
     <string name="longitude" translatable="false">经度：</string>
     <string name="latitude">纬度：</string>
     <string name="_15_478551">例：15.4785512213</string>
@@ -8,4 +8,9 @@
     <string name="choose_position">去地图选点</string>
     <string name="teleport">一键传送</string>
     <string name="history_tele_location">历史传送的位置</string>
+    <string name="go_home">回家\n</string>
+    <string name="rename">修改位置名称</string>
+    <string name="guarantee">我保证该软件仅用于学习使用</string>
+    <string name="access_app">进入应用</string>
+    <string name="ad_rent">广告位招租</string>
 </resources>

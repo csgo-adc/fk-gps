@@ -1,9 +1,10 @@
-package com.android.bluetooths.database
+package com.android.nfc.system.database
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface LocationDao {
@@ -13,6 +14,9 @@ interface LocationDao {
 
     @Insert
     fun addLocation(vararg LocationData: LocationData)
+
+    @Update
+    fun updateLocation(vararg LocationData: LocationData)
 
     @Delete
     fun deleteLocation(vararg LocationData: LocationData)

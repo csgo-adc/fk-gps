@@ -1,15 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/welcomeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to MyApp"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"/>
+    <data>
+        <variable
+        name="clickListener"
+        type="com.android.nfc.system.ui.WelcomeActivity.ClickListener" />
+    </data>
 
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/ad_rent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/ad_rent"
+            android:textColor="@android:color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/ad_rent"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="10dp"
+            android:textSize="40sp" />
+
+
+        <LinearLayout
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="50dp">
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/guarantee" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/access"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/access_app"
+            android:textSize="30sp"
+            android:onClick="@{()->clickListener.onAccessClick()}"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/line1"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/shape_rec_blue" />
+
+    </RelativeLayout>
+</layout>

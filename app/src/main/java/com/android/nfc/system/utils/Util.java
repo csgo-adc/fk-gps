@@ -1,4 +1,4 @@
-package com.android.bluetooths.utils;
+package com.android.nfc.system.utils;
 
 import android.app.Activity;
 import android.app.ActivityManager;

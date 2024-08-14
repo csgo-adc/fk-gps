@@ -6,7 +6,7 @@
     <data>
         <variable
             name="clickListener"
-            type="com.android.bluetooths.ui.MapFragment.ClickListener" />
+            type="com.android.nfc.system.ui.MapFragment.ClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +32,30 @@
                 android:layout_marginBottom="30dp"
                 android:layout_marginStart="30dp"
                 android:background="@color/colorAccent" />
+
+            <ImageButton
+                android:id="@+id/go_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="30dp"
+                android:onClick="@{()->clickListener.onGoHomeClick()}"
+                android:theme="@style/RippleWhite"
+                app:tint="@color/colorAccent"
+                app:srcCompat="@drawable/ic_home_position"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/go_home" />
+
+            <Spinner
+                android:id="@+id/action_bar_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="60dp"
+                android:onItemSelected="@{(parent, view, position, id) -> clickListener.onSelected(parent, view, position, id)}"
+                android:background="@drawable/shape_rec_blue"
+                android:entries="@array/spinnerclass" />
 
         </RelativeLayout>
 

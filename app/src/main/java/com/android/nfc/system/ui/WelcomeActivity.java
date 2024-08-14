@@ -1,34 +1,67 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.widget.CheckBox;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
-import com.android.bluetooths.R;
+import com.android.nfc.system.R;
+import com.android.nfc.system.databinding.ActivityWelcomeBinding;
+import com.android.nfc.system.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class WelcomeActivity extends BaseActivity {
+    private CheckBox mCheckBox;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_welcome);
+        ActivityWelcomeBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_welcome);
 
-        requestPermissions();
+        mCheckBox = dataBinding.checkbox;
+
+        if(getSharedPreferences("checkInfo",0).getBoolean("cbState",false)){
+            mCheckBox.setChecked(true);
+        }
+
+        if (mCheckBox.isChecked()) {
+
+            dataBinding.access.setVisibility(View.GONE);
+
+            new Handler().postDelayed(() -> {
+                startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+                finish();
+            }, 1500);
+        }
+        dataBinding.setClickListener(new ClickListener());
+    }
+
+    public class ClickListener {
+        public void onAccessClick() {
+            if (mCheckBox.isChecked()) {
+                getSharedPreferences("checkInfo",0).edit().putBoolean("cbState",true).apply();
+
+                requestPermissions();
+            } else {
+                Util.DisplayToast(WelcomeActivity.this, "请勾选用户使用协议");
+            }
+        }
     }
 
     private void requestPermissions() {
-        String[] permissions = new String[] {
+        String[] permissions = new String[]{
                 Manifest.permission.INTERNET,
                 Manifest.permission.ACCESS_NETWORK_STATE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -66,17 +99,11 @@ public class WelcomeActivity extends BaseActivity {
 
         if (allPermissionsGranted) {
             proceedToMain();
-        } else {
-            // 处理权限未授予的情况
-            // 可以在这里显示提示或终止应用
         }
     }
 
     private void proceedToMain() {
-        // 权限授予后停留2秒并跳转到主页面
-        new Handler().postDelayed(() -> {
-            startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
-            finish();
-        }, 1000); // 2秒
+        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+        finish();
     }
 }

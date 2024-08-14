@@ -1,10 +1,9 @@
-package com.android.bluetooths.utils;
+package com.android.nfc.system.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationManager;
 import android.location.provider.ProviderProperties;
 import android.net.ConnectivityManager;
@@ -13,9 +12,7 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.SystemClock;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 

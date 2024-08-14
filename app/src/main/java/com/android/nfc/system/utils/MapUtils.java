@@ -1,4 +1,4 @@
-package com.android.bluetooths.utils;
+package com.android.nfc.system.utils;
 
 public class MapUtils {
 //    public final static String COORDINATE_TYPE_GCJ02 = "gcj02";

@@ -1,4 +1,4 @@
-package com.android.bluetooths.viewmodel;
+package com.android.nfc.system.viewmodel;
 
 import androidx.annotation.NonNull;
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.android.bluetooths">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 访问网络，进行地图相关业务数据请求，包括地图数据，路线规划，POI检索等 -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- 获取网络状态，根据网络状态切换进行数据请求网络转换 -->
@@ -10,19 +9,21 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 这个权限用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
-    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"
+    <uses-permission
+        android:name="android.permission.ACCESS_MOCK_LOCATION"
         tools:ignore="MockLocation,ProtectedPermissions" />
 
 
     <application
-        android:name=".ui.Application"
+        android:name="com.android.nfc.system.ui.Application"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -35,9 +36,9 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="bPePaSQS44n9NTMGGIHOV5krswy2WAsx" />
 
-        <activity android:name=".ui.BaseActivity" />
+        <activity android:name="com.android.nfc.system.ui.BaseActivity" />
         <activity
-            android:name=".ui.WelcomeActivity"
+            android:name="com.android.nfc.system.ui.WelcomeActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -46,19 +47,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LocationActivity" />
-        <activity android:name=".ui.MainActivity" />
+        <activity android:name="com.android.nfc.system.ui.LocationActivity" />
+        <activity android:name="com.android.nfc.system.ui.MainActivity" />
 
 
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:exported="false"
-            android:process=":remote" >
+            android:process=":remote">
 
         </service>
 
-        <service android:name=".service.LocService"/>
+        <service android:name="com.android.nfc.system.service.LocService" />
 
     </application>
 

@@ -1,4 +1,4 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,16 +21,16 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.android.bluetooths.R;
-import com.android.bluetooths.database.DbManager;
-import com.android.bluetooths.database.LocationDao;
-import com.android.bluetooths.database.LocationData;
-import com.android.bluetooths.databinding.FragmentMapBinding;
-import com.android.bluetooths.service.LocService;
-import com.android.bluetooths.utils.MapUtils;
-import com.android.bluetooths.utils.PermissionUtils;
-import com.android.bluetooths.utils.Util;
-import com.android.bluetooths.viewmodel.SearchViewModel;
+import com.android.nfc.system.R;
+import com.android.nfc.system.database.DbManager;
+import com.android.nfc.system.database.LocationDao;
+import com.android.nfc.system.database.LocationData;
+import com.android.nfc.system.databinding.FragmentMapBinding;
+import com.android.nfc.system.service.LocService;
+import com.android.nfc.system.utils.MapUtils;
+import com.android.nfc.system.utils.PermissionUtils;
+import com.android.nfc.system.utils.Util;
+import com.android.nfc.system.viewmodel.SearchViewModel;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -58,7 +59,9 @@ import com.baidu.mapapi.search.aoi.OnGetAoiSearchResultListener;
 import com.baidu.mapapi.search.core.AoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MapFragment extends Fragment {
@@ -67,7 +70,7 @@ public class MapFragment extends Fragment {
     private Activity mActivity;
     private LocService.ServiceBinder mServiceBinder;
     private ServiceConnection mConnection;
-
+    FragmentMapBinding mDataBinding;
     private SearchViewModel searchViewModel;
 
     private MapView mMapView;
@@ -76,9 +79,9 @@ public class MapFragment extends Fragment {
     private LocationClient mLocClient;
     private MyLocationData myLocationData;
 
-    private boolean isNeedLocation = true;
+    private boolean isNeedMove2Location = true;
     private boolean isMockServStart = false;
-    private String mCurrentCity = null;
+    private String mCurrentCity = "nu";
     private double mCurrentLat = 0.0;       // 当前位置的百度纬度
     private double mCurrentLon = 0.0;       // 当前位置的百度经度
     private float mCurrentDirection = 0.0f;
@@ -107,11 +110,12 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.e("baidu", "onCreateView");
 
-        FragmentMapBinding dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
 
-        mMapView = dataBinding.bmapView;
+        mMapView = mDataBinding.bmapView;
 
-        dataBinding.setClickListener(new ClickListener());
+        mDataBinding.setClickListener(new ClickListener());
+
 
         mConnection = new ServiceConnection() {
             @Override
@@ -125,33 +129,30 @@ public class MapFragment extends Fragment {
             }
         };
 
-        return dataBinding.getRoot();
+        return mDataBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.e("baidu", "onViewCreated");
-
         initMap();
         initSearch();
+        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
 
         Bundle bundle = getArguments();
         if (bundle != null) {
             double latitude = bundle.getDouble(MainActivity.LAT_VALUE);
-            double longitude = bundle.getDouble(MainActivity.LNG_VALUE);
+            double longitude = bundle.getDouble(MainActivity.LON_VALUE);
             LatLng latLng = new LatLng(latitude, longitude);
 
-            isNeedLocation = false;
+            isNeedMove2Location = false;
 
             doSearch(latLng);
 
         }
-        if (isNeedLocation) {
-            initMapLocation();
+        initMapLocation();
 
-        }
 
         mConnection = new ServiceConnection() {
             @Override
@@ -189,9 +190,6 @@ public class MapFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-
-        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
-
     }
 
     @Override
@@ -227,6 +225,8 @@ public class MapFragment extends Fragment {
 
             @Override
             public void onMapPoiClick(MapPoi mapPoi) {
+
+                markMap(mapPoi.getPosition());
 
             }
         });
@@ -272,6 +272,7 @@ public class MapFragment extends Fragment {
 
                     mCurrentCity = location.getCity();
 
+                    searchViewModel.setCity(mCurrentCity);
 
                     myLocationData = new MyLocationData.Builder()
                             .accuracy(location.getRadius())// 设置定位数据的精度信息，单位：米
@@ -280,26 +281,16 @@ public class MapFragment extends Fragment {
                             .longitude(location.getLongitude())
                             .build();
                     mBaiduMap.setMyLocationData(myLocationData);
-                    if (isFirstLoc) {
-                        searchViewModel.setCity(mCurrentCity);
+                    if (isFirstLoc && isNeedMove2Location) {
                         isFirstLoc = false;
                         LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
                         MapStatus.Builder builder = new MapStatus.Builder();
                         builder.target(ll).zoom(18.0f);
                         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+
                     }
                 }
 
-                /**
-                 * 错误的状态码
-                 * <a><a href="http://lbsyun.baidu.com/index.php?title=android-locsdk/guide/addition-func/error-code">...</a></a>
-                 * <p>
-                 * 回调定位诊断信息，开发者可以根据相关信息解决定位遇到的一些问题
-                 *
-                 * @param locType      当前定位类型
-                 * @param diagnosticType  诊断类型（1~9）
-                 * @param diagnosticMessage 具体的诊断信息释义
-                 */
                 @Override
                 public void onLocDiagnosticMessage(int locType, int diagnosticType, String diagnosticMessage) {
                 }
@@ -321,7 +312,6 @@ public class MapFragment extends Fragment {
         mSearch.setOnGetAoiSearchResultListener(new OnGetAoiSearchResultListener() {
             @Override
             public void onGetAoiResult(AoiResult aoiResult) {
-                mBaiduMap.clear();
                 if (aoiResult == null) {
                     return;
                 }
@@ -363,7 +353,6 @@ public class MapFragment extends Fragment {
 
         mSearch.requestAoi(aoiSearchOption);
 
-        markMap(latLng);
     }
 
     private static LocationClientOption getLocationClientOption() {
@@ -426,6 +415,10 @@ public class MapFragment extends Fragment {
     }
 
     public class ClickListener {
+        public void onGoHomeClick() {
+            resetMap();
+        }
+
         public void onSendClick() {
             if (!PermissionUtils.isAllowMockLocation(mActivity)) {
                 PermissionUtils.showEnableMockLocationDialog(mActivity);
@@ -447,38 +440,89 @@ public class MapFragment extends Fragment {
             }
 
             startGoLocation();
+            mDataBinding.sendToPosition.setVisibility(View.GONE);
+
 
         }
+
+        public void onSelected(AdapterView<?> parent, View view, int position, long id) {
+
+
+            switch (position) {
+                case 0:
+                    mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+                    break;
+                case 1:
+                    mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+                    break;
+                case 2:
+                    mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NONE);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
+
+
+
+    private void stopGoLocation() {
+        mActivity.unbindService(mConnection);
+        Intent intent = new Intent(mActivity, LocService.class);
+        mActivity.stopService(intent);
+        isMockServStart = false;
     }
 
 
     private void startGoLocation() {
-        if (!isMarked || mMarkLatLngMap == null) {
-            Util.DisplayToast(mActivity, "请标记传送地点");
-            return;
-        }
-        LocationData data = new LocationData("地点", mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
-        LocDao.addLocation(data);
+
         if (isMockServStart) {
 
+            if (mMarkLatLngMap == null) {
+                stopGoLocation();
+            } else {
+                double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
 
-            double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+                mServiceBinder.setPosition(latLng[0], latLng[1], mAltitude);
 
-            mServiceBinder.setPosition(latLng[0], latLng[1], mAltitude);
-            resetMap();
+                mCurrentLon = mMarkLatLngMap.longitude;
+                mCurrentLat = mMarkLatLngMap.latitude;
 
+                resetMap();
+
+                mMarkLatLngMap = null;
+
+                mBaiduMap.clear();
+            }
         } else {
+            if (mMarkLatLngMap == null) {
+                Util.DisplayToast(mActivity, "请标记地点");
+                return;
+            }
 
             Intent intent = new Intent(mActivity, LocService.class);
             mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);    // 绑定服务和活动，之后活动就可以去调服务的方法了
             double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
-            intent.putExtra(MainActivity.LAT_VALUE, latLng[0]);
-            intent.putExtra(MainActivity.LNG_VALUE, latLng[1]);
+            intent.putExtra(MainActivity.LON_VALUE, latLng[0]);
+            intent.putExtra(MainActivity.LAT_VALUE, latLng[1]);
             intent.putExtra(MainActivity.ALT_VALUE, mAltitude);
+
+            savePositionData();
 
             mActivity.startForegroundService(intent);
             isMockServStart = true;
+            mMarkLatLngMap = null;
+            mBaiduMap.clear();
         }
+    }
+
+    private void savePositionData() {
+        SimpleDateFormat formatter = new SimpleDateFormat("MMdd-HH:mm");
+        Date date = new Date();
+
+        LocationData data = new LocationData(formatter.format(date), mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+        LocDao.addLocation(data);
     }
 
 }

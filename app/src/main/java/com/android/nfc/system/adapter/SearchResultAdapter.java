@@ -1,4 +1,4 @@
-package com.android.bluetooths.adapter;
+package com.android.nfc.system.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.bluetooths.R;
-import com.android.bluetooths.ui.OnItemClickListener;
+import com.android.nfc.system.R;
+import com.android.nfc.system.ui.OnItemClickListener;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,15 +1,9 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
-import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.provider.ProviderProperties;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -20,16 +14,15 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
-import androidx.navigation.NavigatorProvider;
-import androidx.navigation.fragment.FragmentNavigator;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.android.bluetooths.R;
+import com.android.nfc.system.R;
 
-import com.android.bluetooths.databinding.ActivityLocationBinding;
-import com.android.bluetooths.databinding.ActivityMainBinding;
-import com.android.bluetooths.viewmodel.SearchViewModel;
-import com.android.bluetooths.viewmodel.Searcher;
+import com.android.nfc.system.databinding.ActivityLocationBinding;
+import com.android.nfc.system.databinding.ActivityMainBinding;
+import com.android.nfc.system.viewmodel.SearchViewModel;
+import com.android.nfc.system.viewmodel.Searcher;
 
 
 public class LocationActivity extends BaseActivity {
@@ -49,10 +42,17 @@ public class LocationActivity extends BaseActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("Loc");
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_container);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment_container);
         NavController navController = navHostFragment.getNavController();
         if (bundle != null) {
-            navController.navigate(R.id.map_Fragment, bundle);
+            navController.popBackStack();
+
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(navController.getGraph().getStartDestinationId(), false)
+                    .setRestoreState(true)
+                    .build();
+            navController.navigate(R.id.map_Fragment, bundle, navOptions);
         }
 
 

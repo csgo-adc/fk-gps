@@ -1,4 +1,4 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,14 +15,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.bluetooths.R;
-import com.android.bluetooths.adapter.SearchResultAdapter;
-import com.android.bluetooths.viewmodel.SearchViewModel;
-import com.android.bluetooths.viewmodel.Searcher;
+import com.android.nfc.system.R;
+import com.android.nfc.system.adapter.SearchResultAdapter;
+import com.android.nfc.system.viewmodel.SearchViewModel;
+import com.android.nfc.system.viewmodel.Searcher;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -40,7 +40,7 @@ public class SearchFragment extends Fragment {
     private SuggestionSearch mSuggestionSearch;
     private RecyclerView mSugListView;
     private SearchResultAdapter mAdapter;
-
+    private NavController navController;
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -60,6 +60,8 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
         initSearch();
     }
 
@@ -123,15 +125,14 @@ public class SearchFragment extends Fragment {
 
                         Bundle bundle = new Bundle();
                         bundle.putDouble(MainActivity.LAT_VALUE, Double.valueOf(map.get("latitude")));
-                        bundle.putDouble(MainActivity.LNG_VALUE, Double.valueOf(map.get("longitude")));
+                        bundle.putDouble(MainActivity.LON_VALUE, Double.valueOf(map.get("longitude")));
 
-                        NavController navController = Navigation.findNavController(mActivity, R.id.search_Fragment);
 
                         NavOptions navOptions = new NavOptions.Builder()
                                 .setPopUpTo(navController.getGraph().getStartDestinationId(), false)
                                 .setRestoreState(true)
                                 .build();
-                        navController.navigate(R.id.map_Fragment, null, navOptions);
+                        navController.navigate(R.id.map_Fragment, bundle, navOptions);
                     }
 
                     @Override

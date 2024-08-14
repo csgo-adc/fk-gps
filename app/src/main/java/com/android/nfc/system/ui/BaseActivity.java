@@ -1,14 +1,11 @@
-package com.android.bluetooths.ui;
+package com.android.nfc.system.ui;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 
-import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.ThemeUtils;
 
-import com.android.bluetooths.R;
+import com.android.nfc.system.R;
 
 public class BaseActivity extends AppCompatActivity {
 
