@@ -50,7 +50,6 @@
         <activity android:name="com.android.nfc.system.ui.LocationActivity" />
         <activity android:name="com.android.nfc.system.ui.MainActivity" />
 
-
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

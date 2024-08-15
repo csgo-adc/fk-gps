@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.nfc.system.R;
 import com.android.nfc.system.database.LocationData;
-import com.android.nfc.system.ui.OnItemClickListener;
+import com.android.nfc.system.listener.OnItemClickListener;
 
 import java.util.ArrayList;
 

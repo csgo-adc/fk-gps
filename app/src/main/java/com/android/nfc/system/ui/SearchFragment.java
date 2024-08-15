@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.nfc.system.R;
 import com.android.nfc.system.adapter.SearchResultAdapter;
+import com.android.nfc.system.listener.OnItemClickListener;
 import com.android.nfc.system.viewmodel.SearchViewModel;
 import com.android.nfc.system.viewmodel.Searcher;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;

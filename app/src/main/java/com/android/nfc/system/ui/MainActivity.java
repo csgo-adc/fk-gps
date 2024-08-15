@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.nfc.system.R;
 import com.android.nfc.system.adapter.CoordinateAdapter;
+import com.android.nfc.system.listener.OnItemClickListener;
 import com.android.nfc.system.database.DbManager;
 import com.android.nfc.system.database.LocationDao;
 import com.android.nfc.system.database.LocationData;

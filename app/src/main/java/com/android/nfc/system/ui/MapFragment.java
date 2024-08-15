@@ -1,14 +1,23 @@
 package com.android.nfc.system.ui;
 
+import static android.content.Context.SENSOR_SERVICE;
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,27 +67,51 @@ import com.baidu.mapapi.search.aoi.AoiSearchOption;
 import com.baidu.mapapi.search.aoi.OnGetAoiSearchResultListener;
 import com.baidu.mapapi.search.core.AoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MapFragment extends Fragment {
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+public class MapFragment extends Fragment implements SensorEventListener{
 
 
     private Activity mActivity;
     private LocService.ServiceBinder mServiceBinder;
     private ServiceConnection mConnection;
-    FragmentMapBinding mDataBinding;
+    private FragmentMapBinding mDataBinding;
     private SearchViewModel searchViewModel;
+
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagnetic;
+    private float[] mAccValues = new float[3];//加速度传感器数据
+    private float[] mMagValues = new float[3];//地磁传感器数据
+    private final float[] mR = new float[9];//旋转矩阵，用来保存磁场和加速度的数据
+    private final float[] mDirectionValues = new float[3];//模拟方向传感器的数据（原始数据为弧度）
 
     private MapView mMapView;
     private BaiduMap mBaiduMap;
     private AoiSearch mSearch;
+    private GeoCoder mGeoCoder;
     private LocationClient mLocClient;
     private MyLocationData myLocationData;
-
+    private String mPositionName;
     private boolean isNeedMove2Location = true;
     private boolean isMockServStart = false;
     private String mCurrentCity = "nu";
@@ -138,6 +171,7 @@ public class MapFragment extends Fragment {
 
         initMap();
         initSearch();
+        initGeo();
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
 
         Bundle bundle = getArguments();
@@ -175,22 +209,25 @@ public class MapFragment extends Fragment {
 
         super.onResume();
         mMapView.onResume();
+        mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mSensorMagnetic, SensorManager.SENSOR_DELAY_UI);
     }
+    @Override
+    public void onStart() {
+        super.onStart();
 
+    }
     @Override
     public void onPause() {
         Log.e("baidu", "onPause");
 
         super.onPause();
         mMapView.onPause();
+        mSensorManager.unregisterListener(this);
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
 
-    }
 
     @Override
     public void onStop() {
@@ -209,6 +246,7 @@ public class MapFragment extends Fragment {
         mMapView.onDestroy();
         mMapView = null;
         mSearch.destroy();
+        mSensorManager.unregisterListener(this);
     }
 
     private void initMap() {
@@ -234,6 +272,18 @@ public class MapFragment extends Fragment {
         UiSettings mUiSettings = mBaiduMap.getUiSettings();
         mUiSettings.setCompassEnabled(true);
 
+        mSensorManager = (SensorManager) mActivity.getSystemService(SENSOR_SERVICE);// 获取传感器管理服务
+        if (mSensorManager != null) {
+            mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            if (mSensorAccelerometer != null) {
+                mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+            }
+            mSensorMagnetic = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            if (mSensorMagnetic != null) {
+                mSensorManager.registerListener(this, mSensorMagnetic, SensorManager.SENSOR_DELAY_UI);
+            }
+        }
+
     }
 
     private void initMapLocation() {
@@ -248,9 +298,6 @@ public class MapFragment extends Fragment {
                     .setCustomMarker(customMarker).setMarkerSize(0.2f)
                     .setAnimation(true).setMarkerRotation(false)
                     .build();
-
-            mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
-
 
             mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
                 @Override
@@ -341,7 +388,6 @@ public class MapFragment extends Fragment {
             }
         });
 
-
     }
 
     private void doSearch(LatLng latLng) {
@@ -352,6 +398,22 @@ public class MapFragment extends Fragment {
 
 
         mSearch.requestAoi(aoiSearchOption);
+
+    }
+
+    private void initGeo() {
+        mGeoCoder = GeoCoder.newInstance();
+        mGeoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                mPositionName = reverseGeoCodeResult.getPoiList().get(0).name;
+            }
+        });
 
     }
 
@@ -389,6 +451,13 @@ public class MapFragment extends Fragment {
     private void markMap(LatLng latLng) {
         mMarkLatLngMap = latLng;
         isMarked = true;
+
+        ReverseGeoCodeOption GeoOption = new ReverseGeoCodeOption()
+                .location(latLng)
+                .newVersion(1)
+                .radius(500);
+        mGeoCoder.reverseGeoCode(GeoOption);
+
         BitmapDescriptor bitmap = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_mark);
         OverlayOptions option = new MarkerOptions()
@@ -412,6 +481,28 @@ public class MapFragment extends Fragment {
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(new LatLng(mCurrentLat, mCurrentLon)).zoom(18.0f);
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            mAccValues = event.values;
+        }
+        else if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
+            mMagValues = event.values;
+        }
+
+        SensorManager.getRotationMatrix(mR, null, mAccValues, mMagValues);
+        SensorManager.getOrientation(mR, mDirectionValues);
+        mCurrentDirection = (float) Math.toDegrees(mDirectionValues[0]);    // 弧度转角度
+        if (mCurrentDirection < 0) {    // 由 -180 ~ + 180 转为 0 ~ 360
+            mCurrentDirection += 360;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     public class ClickListener {
@@ -466,7 +557,6 @@ public class MapFragment extends Fragment {
     }
 
 
-
     private void stopGoLocation() {
         mActivity.unbindService(mConnection);
         Intent intent = new Intent(mActivity, LocService.class);
@@ -518,10 +608,13 @@ public class MapFragment extends Fragment {
     }
 
     private void savePositionData() {
-        SimpleDateFormat formatter = new SimpleDateFormat("MMdd-HH:mm");
-        Date date = new Date();
 
-        LocationData data = new LocationData(formatter.format(date), mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
+        String position = "未知地点";
+        if (!TextUtils.isEmpty(mPositionName)) {
+            position = mPositionName;
+        }
+
+        LocationData data = new LocationData(position, mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
         LocDao.addLocation(data);
     }
 

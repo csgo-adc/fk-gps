@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.nfc.system.R;
-import com.android.nfc.system.ui.OnItemClickListener;
+import com.android.nfc.system.listener.OnItemClickListener;
 
 import java.util.HashMap;
 import java.util.List;
