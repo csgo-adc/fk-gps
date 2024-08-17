@@ -181,6 +181,7 @@ public class MapFragment extends Fragment implements SensorEventListener{
             LatLng latLng = new LatLng(latitude, longitude);
 
             isNeedMove2Location = false;
+            markMap(latLng);
 
             doSearch(latLng);
 
