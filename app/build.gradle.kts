@@ -4,6 +4,10 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt") // 适用于 Kotlin 项目
+
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
+    id("com.google.gms.google-services")
 }
 configurations {
     create("cleanedAnnotations")
@@ -36,8 +40,8 @@ android {
         applicationId = "com.android.nfc.system"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.1"
+        versionCode = 102
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -122,6 +126,14 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:2.7.7")
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

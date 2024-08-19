@@ -206,8 +206,6 @@ public class MapFragment extends Fragment implements SensorEventListener{
 
     @Override
     public void onResume() {
-        Log.e("baidu", "onResume");
-
         super.onResume();
         mMapView.onResume();
         mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
@@ -220,8 +218,6 @@ public class MapFragment extends Fragment implements SensorEventListener{
     }
     @Override
     public void onPause() {
-        Log.e("baidu", "onPause");
-
         super.onPause();
         mMapView.onPause();
         mSensorManager.unregisterListener(this);
