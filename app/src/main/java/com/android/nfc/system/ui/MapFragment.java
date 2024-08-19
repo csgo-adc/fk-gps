@@ -316,7 +316,6 @@ public class MapFragment extends Fragment implements SensorEventListener{
 
                     mCurrentCity = location.getCity();
 
-                    searchViewModel.setCity(mCurrentCity);
 
                     myLocationData = new MyLocationData.Builder()
                             .accuracy(location.getRadius())// 设置定位数据的精度信息，单位：米
@@ -327,6 +326,8 @@ public class MapFragment extends Fragment implements SensorEventListener{
                     mBaiduMap.setMyLocationData(myLocationData);
                     if (isFirstLoc && isNeedMove2Location) {
                         isFirstLoc = false;
+                        searchViewModel.setCity(mCurrentCity);
+
                         LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
                         MapStatus.Builder builder = new MapStatus.Builder();
                         builder.target(ll).zoom(18.0f);
@@ -367,6 +368,7 @@ public class MapFragment extends Fragment implements SensorEventListener{
                 if (null == aoiList) {
                     return;
                 }
+
                 for (int i = 0; i < aoiList.size(); i++) {
                     AoiInfo aoiInfo = aoiList.get(i);
                     String polygon = aoiInfo.getPolygon();
@@ -374,12 +376,19 @@ public class MapFragment extends Fragment implements SensorEventListener{
                     polygonOptions.points(polygon, EncodePointType.AOI);
                     polygonOptions.stroke(new Stroke(5, Color.argb(155, 155, 150, 150)));// 设置多边形边框信息
                     polygonOptions.fillColor(Color.argb(100, 110, 160, 0));// 设置多边形填充颜色
-                    mBaiduMap.addOverlay(polygonOptions);
+                    try {
+                        // 点数小于1会抛异常，不知道为啥
+                        //BDMapSDKException: when you add polyline, you must at least supply 2 points
+                        mBaiduMap.addOverlay(polygonOptions);
+                        LatLngBounds latLngBounds = mBaiduMap.getOverlayLatLngBounds(polygonOptions);
 
-                    LatLngBounds latLngBounds = mBaiduMap.getOverlayLatLngBounds(polygonOptions);
-                    if (latLngBounds != null) {
-                        boundsBuilder.include(latLngBounds.northeast).include(latLngBounds.southwest);
+                        if (latLngBounds != null) {
+                            boundsBuilder.include(latLngBounds.northeast).include(latLngBounds.southwest);
+                        }
+                    } catch (Exception e) {
+
                     }
+
                 }
                 mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100, 100, 100, 100));
             }
@@ -408,7 +417,11 @@ public class MapFragment extends Fragment implements SensorEventListener{
 
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-                mPositionName = reverseGeoCodeResult.getPoiList().get(0).name;
+                try {
+                    mPositionName = reverseGeoCodeResult.getPoiList().get(0).name;
+                } catch (Exception e) {
+                    Log.e("baidu", e.toString());
+                }
             }
         });
 
@@ -589,11 +602,12 @@ public class MapFragment extends Fragment implements SensorEventListener{
             }
 
             Intent intent = new Intent(mActivity, LocService.class);
-            mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);    // 绑定服务和活动，之后活动就可以去调服务的方法了
             double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
             intent.putExtra(MainActivity.LON_VALUE, latLng[0]);
             intent.putExtra(MainActivity.LAT_VALUE, latLng[1]);
             intent.putExtra(MainActivity.ALT_VALUE, mAltitude);
+
+            mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);    // 绑定服务和活动，之后活动就可以去调服务的方法了
 
             savePositionData();
 

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +76,9 @@ public class SearchFragment extends Fragment {
         searchViewModel.searcherMutableLiveData.observe(this, new Observer<Searcher>() {
             @Override
             public void onChanged(Searcher searcher) {
-                doSearch(searcher.getCity(), searcher.getKeyword());
+                if (null != searcher) {
+                    doSearch(searcher.getCity(), searcher.getKeyword());
+                }
             }
         });
     }
@@ -148,14 +151,13 @@ public class SearchFragment extends Fragment {
     }
 
     private void doSearch(String city, String keyword) {
+        if (TextUtils.isEmpty(city) && TextUtils.isEmpty(keyword)) {
+            return;
+        }
         SuggestionSearchOption option = new SuggestionSearchOption();
-        WeakReference<SuggestionSearchOption> weakReference = new WeakReference<>(option);
-
-        SuggestionSearchOption s = weakReference.get();
-        s.city(city);
-        s.keyword(keyword);
-
-        mSuggestionSearch.requestSuggestion(s);
+        option.city(city);
+        option.keyword(keyword);
+        mSuggestionSearch.requestSuggestion(option);
 
     }
 

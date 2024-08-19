@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.PixelFormat;
 import android.location.Criteria;
 import android.location.Location;
@@ -81,10 +82,11 @@ public class LocService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mCurLon = intent.getDoubleExtra(MainActivity.LON_VALUE, 40.070754);
-        mCurLat = intent.getDoubleExtra(MainActivity.LAT_VALUE, 116.324175);
-        mCurAlt = intent.getDoubleExtra(MainActivity.ALT_VALUE, 250.0);
-
+        if (intent != null) {
+            mCurLon = intent.getDoubleExtra(MainActivity.LON_VALUE, 40.070754);
+            mCurLat = intent.getDoubleExtra(MainActivity.LAT_VALUE, 116.324175);
+            mCurAlt = intent.getDoubleExtra(MainActivity.ALT_VALUE, 250.0);
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -262,7 +264,12 @@ public class LocService extends Service {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
 
-        startForeground(SERVICE_ID, notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(SERVICE_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+        } else {
+            startForeground(SERVICE_ID, notification);
+        }
+
     }
 
     private void initFloatView() {

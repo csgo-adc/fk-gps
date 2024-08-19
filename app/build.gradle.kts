@@ -8,6 +8,7 @@ plugins {
     // Add the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
     id("com.google.gms.google-services")
+
 }
 configurations {
     create("cleanedAnnotations")
@@ -40,8 +41,8 @@ android {
         applicationId = "com.android.nfc.system"
         minSdk = 26
         targetSdk = 34
-        versionCode = 102
-        versionName = "1.0.2"
+        versionCode = 103
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

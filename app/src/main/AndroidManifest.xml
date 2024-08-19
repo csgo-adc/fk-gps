@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
 
     <uses-permission
         android:name="android.permission.ACCESS_MOCK_LOCATION"
@@ -24,6 +25,7 @@
 
     <application
         android:name="com.android.nfc.system.ui.Application"
+        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -54,11 +56,13 @@
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:exported="false"
-            android:process=":remote">
+            android:process=":remote"/>
 
-        </service>
+        <service android:name=".service.LocService"
+            android:foregroundServiceType="location"
+            android:permission="android.permission.BIND_LOCATION_PROVIDER"/>
 
-        <service android:name="com.android.nfc.system.service.LocService" />
+
 
     </application>
 
