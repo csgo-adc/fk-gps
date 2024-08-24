@@ -3,6 +3,8 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven(url = "https://tencent-tds-maven.pkg.coding.net/repository/shiply/repo" )
+
     }
 }
 dependencyResolutionManagement {
@@ -10,6 +12,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://tencent-tds-maven.pkg.coding.net/repository/shiply/repo" )
     }
 }
 

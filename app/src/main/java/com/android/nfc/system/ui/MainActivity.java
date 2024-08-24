@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +27,11 @@ import com.android.nfc.system.database.LocationData;
 import com.android.nfc.system.databinding.ActivityMainBinding;
 import com.android.nfc.system.utils.PermissionUtils;
 import com.android.nfc.system.utils.Util;
+import com.tencent.rdelivery.update.UpdateManager;
+import com.tencent.upgrade.bean.UpgradeConfig;
+import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback;
+import com.tencent.upgrade.core.UpgradeManager;
+import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck;
 
 import java.util.ArrayList;
 
@@ -52,17 +58,32 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         ActivityMainBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         dataBinding.setClickListener(new ClickListener());
 
         latEdit = dataBinding.latEdit;
         lonEdit = dataBinding.lonEdit;
-        //initData(mList);
-
         mRecycleView = dataBinding.recyclerView;
 
+        checkUpdate();
+        initData();
+
+    }
+
+    private void checkUpdate() {
+        // 使用的是腾讯的Shiply，用于检测更新
+        // https://shiply.tds.qq.com/
+        UpgradeConfig.Builder builder = new UpgradeConfig.Builder();
+        UpgradeConfig config = builder.appId(getResources().getString(R.string.UpgradeConfig_appid))
+                .appKey(getResources().getString(R.string.UpgradeConfig_app_key)).build();
+        UpgradeManager.getInstance().init(getApplicationContext(), config);
+
+        UpgradeManager.getInstance().checkUpgrade(true, null, new DefaultUpgradeStrategyRequestCallback());
+
+    }
+
+    private void initData() {
         mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecycleView.setLayoutManager(mLinearLayoutManager);
         ArrayList<LocationData> data = (ArrayList<LocationData>) LocDao.queryAll();
@@ -86,7 +107,6 @@ public class MainActivity extends BaseActivity {
                 showDeleteDialog(MainActivity.this, data, position);
             }
         });
-
     }
 
     @SuppressLint({"NotifyDataSetChanged", "ResourceType"})
@@ -140,9 +160,8 @@ public class MainActivity extends BaseActivity {
                 Util.DisplayToast(MainActivity.this, "请输入经纬度");
                 return;
             }
-            mLon = Double.valueOf(lonEdit.getText().toString());
-
-            mLat = Double.valueOf(latEdit.getText().toString());
+            mLon = Double.parseDouble(lonEdit.getText().toString());
+            mLat = Double.parseDouble(latEdit.getText().toString());
 
             if (!PermissionUtils.isNetworkConnected(MainActivity.this)) {
                 Util.DisplayToast(getApplicationContext(), "no network");
@@ -159,7 +178,10 @@ public class MainActivity extends BaseActivity {
             intent.putExtra("Loc", bundle);
             startActivity(intent);
 
+        }
 
+        public void onUpdateClick() {
+            UpgradeManager.getInstance().checkUpgrade(true, null, new UpgradeReqCallbackForUserManualCheck());
         }
 
     }

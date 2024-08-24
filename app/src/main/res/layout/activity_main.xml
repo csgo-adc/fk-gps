@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="clickListener"
             type="com.android.nfc.system.ui.MainActivity.ClickListener" />
@@ -68,23 +69,23 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/lat_edit"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lat_edit">
 
                 <Button
                     android:id="@+id/btn_map"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="65dp"
+                    android:background="@color/lightseagreen"
                     android:onClick="@{()->clickListener.onMapClick()}"
-                    android:text="@string/choose_position"
-                    android:background="@color/lightseagreen" />
+                    android:text="@string/choose_position" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:layout_marginEnd="65dp">
+                    android:layout_marginEnd="65dp"
+                    android:gravity="right">
 
                     <Button
                         android:id="@+id/btn_teleport"
@@ -124,7 +125,21 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"
+            android:background="@color/white_pressed"
+            android:onClick="@{()->clickListener.onUpdateClick()}"
+            android:text="@string/check_update"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

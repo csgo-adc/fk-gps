@@ -41,8 +41,8 @@ android {
         applicationId = "com.android.nfc.system"
         minSdk = 26
         targetSdk = 34
-        versionCode = 103
-        versionName = "1.0.3"
+        versionCode = 105
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -71,7 +71,8 @@ android {
     applicationVariants.all {
         outputs.all {
             val outputFileName = "LocationAssistant-${versionName}-${buildType.name}.apk"
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = outputFileName
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+                outputFileName
         }
     }
     compileOptions {
@@ -92,6 +93,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    packagingOptions {
+        pickFirst("lib/*/libc++_shared.so")
     }
 }
 
@@ -135,6 +139,10 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+
+    implementation("com.tencent.bugly:crashreport:latest.release")
+    implementation("com.tencent.shiply:upgrade:2.2.0")
+    implementation("com.tencent.shiply:upgrade-ui:2.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
