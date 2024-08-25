@@ -14,4 +14,5 @@
     <string name="access_app">进入应用</string>
     <string name="ad_rent">广告位招租</string>
     <string name="check_update">检测更新</string>
+    <string name="mocking">"模拟定位中…"</string>
 </resources>

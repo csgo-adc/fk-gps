@@ -259,7 +259,7 @@ public class LocService extends Service {
         Notification notification = new NotificationCompat.Builder(this, SERVICE_GO_NOTE_CHANNEL_ID)
                 .setChannelId(SERVICE_GO_NOTE_CHANNEL_ID)
                 .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText("模拟定位中...")
+                .setContentText(getResources().getString(R.string.mocking))
                 .setContentIntent(clickPI)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
@@ -290,36 +290,37 @@ public class LocService extends Service {
         floatingView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("wang", "点击");
+
             }
         });
         floatingView.setOnTouchListener(new View.OnTouchListener() {//给悬浮窗设置触摸监听、用来处理拖动事件，实现悬浮窗拖动时改变悬浮窗位置
-            private int initialX,initialY;//声明每次拖动前的位置的坐标
-            private float initialTouchX,initialTouchY;//声明
+            private int initialX, initialY;//声明每次拖动前的位置的坐标
+            private float initialTouchX, initialTouchY;//声明
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN://触摸发生时
                         startTouchTime = System.currentTimeMillis();
 
-                        initialX = params.x;initialY = params.y;//悬浮窗的坐标
-                        Log.d("Touch","悬浮窗坐标："+initialY+","+initialY);
+                        initialX = params.x;
+                        initialY = params.y;//悬浮窗的坐标
 
-                        initialTouchX = event.getRawX();initialTouchY = event.getRawY();//触摸点坐标
-                        Log.d("Touch","触摸点坐标："+initialTouchX+","+initialTouchY);
+                        initialTouchX = event.getRawX();
+                        initialTouchY = event.getRawY();//触摸点坐标
                         return true;
                     case MotionEvent.ACTION_MOVE://移动发生时
-                        int detailX = (int) (event.getRawX()-initialTouchX);int detailY = (int) (event.getRawY()-initialTouchY);//触摸点位移量
-                        Log.d("Touch","触摸位移量："+detailX+","+detailY);
+                        int detailX = (int) (event.getRawX() - initialTouchX);
+                        int detailY = (int) (event.getRawY() - initialTouchY);//触摸点位移量
 
-                        params.x = initialX+detailX; params.y = initialY+detailY;
-                        Log.d("Touch","悬浮窗新坐标："+params.x+","+params.y);
-                        mWindowManager.updateViewLayout(floatingView,params);//更新悬浮窗位置
+                        params.x = initialX + detailX;
+                        params.y = initialY + detailY;
+                        mWindowManager.updateViewLayout(floatingView, params);//更新悬浮窗位置
                         return true;
                     case MotionEvent.ACTION_UP://触摸松开时
                         //计算触摸持续时间
-                        long touchTime = System.currentTimeMillis()-startTouchTime;
-                        if(touchTime<MaxClickTime){
+                        long touchTime = System.currentTimeMillis() - startTouchTime;
+                        if (touchTime < MaxClickTime) {
                             v.performClick();
                         }
                 }

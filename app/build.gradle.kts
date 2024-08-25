@@ -41,8 +41,8 @@ android {
         applicationId = "com.android.nfc.system"
         minSdk = 26
         targetSdk = 34
-        versionCode = 105
-        versionName = "1.0.5"
+        versionCode = 107
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

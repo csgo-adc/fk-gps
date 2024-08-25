@@ -1,11 +1,9 @@
 package com.android.nfc.system.ui;
 
 import static android.content.Context.SENSOR_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -73,20 +71,8 @@ import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class MapFragment extends Fragment implements SensorEventListener{
 
@@ -136,19 +122,14 @@ public class MapFragment extends Fragment implements SensorEventListener{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("baidu", "onCreate");
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("baidu", "onCreateView");
-
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
 
         mMapView = mDataBinding.bmapView;
 
         mDataBinding.setClickListener(new ClickListener());
-
 
         mConnection = new ServiceConnection() {
             @Override
@@ -223,12 +204,8 @@ public class MapFragment extends Fragment implements SensorEventListener{
         mSensorManager.unregisterListener(this);
     }
 
-
-
-
     @Override
     public void onStop() {
-
         super.onStop();
     }
 
@@ -315,7 +292,6 @@ public class MapFragment extends Fragment implements SensorEventListener{
                     mCurrentLon = location.getLongitude();
 
                     mCurrentCity = location.getCity();
-
 
                     myLocationData = new MyLocationData.Builder()
                             .accuracy(location.getRadius())// 设置定位数据的精度信息，单位：米
