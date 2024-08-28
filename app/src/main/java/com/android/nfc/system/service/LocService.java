@@ -240,7 +240,6 @@ public class LocService extends Service {
     @SuppressLint("ForegroundServiceType")
     private void initNotification() {
 
-
         NotificationChannel mChannel = new NotificationChannel(SERVICE_GO_NOTE_CHANNEL_ID,
                 SERVICE_GO_NOTE_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 

@@ -74,7 +74,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapFragment extends Fragment implements SensorEventListener{
+public class MapFragment extends Fragment implements SensorEventListener {
 
 
     private Activity mActivity;
@@ -192,11 +192,13 @@ public class MapFragment extends Fragment implements SensorEventListener{
         mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorMagnetic, SensorManager.SENSOR_DELAY_UI);
     }
+
     @Override
     public void onStart() {
         super.onStart();
 
     }
+
     @Override
     public void onPause() {
         super.onPause();
