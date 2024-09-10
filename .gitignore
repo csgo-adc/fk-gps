@@ -16,3 +16,4 @@ local.properties
 app/release
 app/debug
 app/src/main/res/values/key.xml
+app/google-services.json
