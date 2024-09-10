@@ -151,9 +151,13 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
 
-kapt {
+    //Xposed
+    implementation("com.github.kyuubiran:EzXHelper:2.2.0")
+    compileOnly("de.robv.android.xposed:api:82")
+
+}
+    kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
     }

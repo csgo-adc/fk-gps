@@ -5,9 +5,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.tencent.bugly.crashreport.CrashReport;
-import com.tencent.upgrade.bean.UpgradeConfig;
-import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback;
-import com.tencent.upgrade.core.UpgradeManager;
+
 
 public class Application extends android.app.Application {
 
