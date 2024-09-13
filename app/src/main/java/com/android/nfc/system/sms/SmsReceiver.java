@@ -53,7 +53,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
     private String extractVerificationCode(String message) {
         Log.d(TAG, "extractVerificationCode: " + message);
-        Pattern pattern = Pattern.compile("\\b\\d{4,6}\\b"); // Adjust the regex based on the expected code format
+        Pattern pattern = Pattern.compile("\\d{4,6}");
         Matcher matcher = pattern.matcher(message);
         if (matcher.find()) {
             return matcher.group();

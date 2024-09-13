@@ -1,1 +1,1 @@
-com.android.nfc.system.hook.LocationSpoofingModule
+com.android.nfc.system.hook.HookModule
