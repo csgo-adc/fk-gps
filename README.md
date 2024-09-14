@@ -7,6 +7,5 @@
 本软件仅用于学习交流使用，请勿用于各种作弊场景，否则一切后果请自行承担。
 
 ## Star History
-![star](https://star-history.com/#csgo-adc/fk-gps&Date)
 
-
+[![Star History Chart](https://api.star-history.com/svg?repos=csgo-adc/fk-gps&type=Date)](https://star-history.com/#csgo-adc/fk-gps&Date)
