@@ -1,4 +1,4 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -19,15 +19,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.adapter.CoordinateAdapter;
-import com.android.framework.wifis.listener.OnItemClickListener;
-import com.android.framework.wifis.database.DbManager;
-import com.android.framework.wifis.database.LocationDao;
-import com.android.framework.wifis.database.LocationData;
-import com.android.framework.wifis.databinding.ActivityMainBinding;
-import com.android.framework.wifis.utils.PermissionUtils;
-import com.android.framework.wifis.utils.Util;
+import com.whatsapp.R;
+import com.whatsapp.adapter.CoordinateAdapter;
+import com.whatsapp.listener.OnItemClickListener;
+import com.whatsapp.database.DbManager;
+import com.whatsapp.database.LocationDao;
+import com.whatsapp.database.LocationData;
+import com.whatsapp.databinding.ActivityMainBinding;
+import com.whatsapp.utils.PermissionUtils;
+import com.whatsapp.utils.Util;
 import com.tencent.rdelivery.update.UpdateManager;
 import com.tencent.upgrade.bean.UpgradeConfig;
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback;

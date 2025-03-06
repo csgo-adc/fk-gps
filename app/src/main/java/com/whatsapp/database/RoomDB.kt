@@ -1,4 +1,4 @@
-package com.android.framework.wifis.database
+package com.whatsapp.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

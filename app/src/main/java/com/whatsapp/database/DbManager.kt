@@ -1,9 +1,9 @@
-package com.android.framework.wifis.database
+package com.whatsapp.database
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.android.framework.wifis.ui.Application
+import com.whatsapp.ui.Application
 
 object DbManager {
 

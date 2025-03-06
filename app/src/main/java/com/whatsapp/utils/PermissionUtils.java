@@ -1,4 +1,4 @@
-package com.android.framework.wifis.utils;
+package com.whatsapp.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

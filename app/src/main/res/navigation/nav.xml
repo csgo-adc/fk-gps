@@ -7,14 +7,14 @@
 
     <fragment
         android:id="@+id/search_Fragment"
-        android:name="com.android.framework.wifis.ui.SearchFragment"
+        android:name="com.whatsapp.ui.SearchFragment"
         android:label="search"
         tools:layout="@layout/fragment_search" >
 
     </fragment>
     <fragment
         android:id="@+id/map_Fragment"
-        android:name="com.android.framework.wifis.ui.MapFragment"
+        android:name="com.whatsapp.ui.MapFragment"
         android:label="map"
         tools:layout="@layout/fragment_map" />
 </navigation>

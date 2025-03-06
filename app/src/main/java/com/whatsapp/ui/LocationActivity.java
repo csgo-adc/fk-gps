@@ -1,4 +1,4 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,12 +17,12 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.android.framework.wifis.R;
+import com.whatsapp.R;
 
-import com.android.framework.wifis.databinding.ActivityLocationBinding;
-import com.android.framework.wifis.databinding.ActivityMainBinding;
-import com.android.framework.wifis.viewmodel.SearchViewModel;
-import com.android.framework.wifis.viewmodel.Searcher;
+import com.whatsapp.databinding.ActivityLocationBinding;
+import com.whatsapp.databinding.ActivityMainBinding;
+import com.whatsapp.viewmodel.SearchViewModel;
+import com.whatsapp.viewmodel.Searcher;
 
 
 public class LocationActivity extends BaseActivity {

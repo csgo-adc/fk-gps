@@ -1,4 +1,4 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,11 +20,11 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.adapter.SearchResultAdapter;
-import com.android.framework.wifis.listener.OnItemClickListener;
-import com.android.framework.wifis.viewmodel.SearchViewModel;
-import com.android.framework.wifis.viewmodel.Searcher;
+import com.whatsapp.R;
+import com.whatsapp.adapter.SearchResultAdapter;
+import com.whatsapp.listener.OnItemClickListener;
+import com.whatsapp.viewmodel.SearchViewModel;
+import com.whatsapp.viewmodel.Searcher;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;

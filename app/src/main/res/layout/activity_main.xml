@@ -7,7 +7,7 @@
 
         <variable
             name="clickListener"
-            type="com.android.framework.wifis.ui.MainActivity.ClickListener" />
+            type="com.whatsapp.ui.MainActivity.ClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

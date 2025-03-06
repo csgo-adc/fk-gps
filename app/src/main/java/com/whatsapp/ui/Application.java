@@ -1,6 +1,6 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
-import com.android.framework.wifis.R;
+import com.whatsapp.R;
 import com.baidu.location.LocationClient;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;

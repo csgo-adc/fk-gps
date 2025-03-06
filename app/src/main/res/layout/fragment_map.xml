@@ -6,7 +6,7 @@
     <data>
         <variable
             name="clickListener"
-            type="com.android.framework.wifis.ui.MapFragment.ClickListener" />
+            type="com.whatsapp.ui.MapFragment.ClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

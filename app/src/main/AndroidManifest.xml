@@ -34,7 +34,7 @@
 
 
         <application
-            android:name="com.android.framework.wifis.ui.Application"
+            android:name="com.whatsapp.ui.Application"
             android:requestLegacyExternalStorage="true"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -57,11 +57,11 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="MJqYTCgwBAgnwVcjzSkryKgcWQPdUitd" />
+            android:value="uUtGbpKVud17mxoHUkaBRhs2tbEXs7JA" />
 
-        <activity android:name="com.android.framework.wifis.ui.BaseActivity" />
+        <activity android:name="com.whatsapp.ui.BaseActivity" />
         <activity
-            android:name="com.android.framework.wifis.ui.WelcomeActivity"
+            android:name="com.whatsapp.ui.WelcomeActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -70,8 +70,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.android.framework.wifis.ui.LocationActivity" />
-        <activity android:name="com.android.framework.wifis.ui.MainActivity" />
+        <activity android:name="com.whatsapp.ui.LocationActivity" />
+        <activity android:name="com.whatsapp.ui.MainActivity" />
 
         <service
             android:name="com.baidu.location.f"

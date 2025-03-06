@@ -1,4 +1,4 @@
-package com.android.framework.wifis.service;
+package com.whatsapp.service;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -37,8 +37,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.ui.MainActivity;
+import com.whatsapp.R;
+import com.whatsapp.ui.MainActivity;
 
 public class LocService extends Service {
     private static final int SERVICE_ID = 1;

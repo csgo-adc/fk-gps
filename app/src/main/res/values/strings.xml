@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">定位助手</string>
+    <string name="app_name">Mys Venue</string>
     <string name="longitude" translatable="false">经度：</string>
     <string name="latitude">纬度：</string>
     <string name="_15_478551">例：15.4785512213</string>

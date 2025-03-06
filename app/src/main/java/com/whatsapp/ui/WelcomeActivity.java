@@ -1,4 +1,4 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import android.Manifest;
 import android.content.Intent;
@@ -15,9 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.databinding.ActivityWelcomeBinding;
-import com.android.framework.wifis.utils.Util;
+import com.whatsapp.R;
+import com.whatsapp.databinding.ActivityWelcomeBinding;
+import com.whatsapp.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;

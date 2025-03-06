@@ -1,11 +1,11 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.framework.wifis.R;
+import com.whatsapp.R;
 
 public class BaseActivity extends AppCompatActivity {
 

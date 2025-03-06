@@ -1,4 +1,4 @@
-package com.android.framework.wifis.viewmodel;
+package com.whatsapp.viewmodel;
 
 import androidx.annotation.NonNull;
 

@@ -1,4 +1,4 @@
-package com.android.framework.wifis.utils;
+package com.whatsapp.utils;
 
 public class MapUtils {
 //    public final static String COORDINATE_TYPE_GCJ02 = "gcj02";

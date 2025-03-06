@@ -1,4 +1,4 @@
-package com.android.framework.wifis.adapter;
+package com.whatsapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -9,9 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.database.LocationData;
-import com.android.framework.wifis.listener.OnItemClickListener;
+import com.whatsapp.R;
+import com.whatsapp.database.LocationData;
+import com.whatsapp.listener.OnItemClickListener;
 
 import java.util.ArrayList;
 

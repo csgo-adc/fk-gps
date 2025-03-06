@@ -1,4 +1,4 @@
-package com.android.framework.wifis.utils;
+package com.whatsapp.utils;
 
 import android.app.Activity;
 import android.app.ActivityManager;

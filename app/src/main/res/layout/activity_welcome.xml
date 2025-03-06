@@ -4,7 +4,7 @@
     <data>
         <variable
         name="clickListener"
-        type="com.android.framework.wifis.ui.WelcomeActivity.ClickListener" />
+        type="com.whatsapp.ui.WelcomeActivity.ClickListener" />
     </data>
 
     <RelativeLayout

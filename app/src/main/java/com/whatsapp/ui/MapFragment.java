@@ -1,4 +1,4 @@
-package com.android.framework.wifis.ui;
+package com.whatsapp.ui;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -28,16 +28,16 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.android.framework.wifis.R;
-import com.android.framework.wifis.database.DbManager;
-import com.android.framework.wifis.database.LocationDao;
-import com.android.framework.wifis.database.LocationData;
-import com.android.framework.wifis.databinding.FragmentMapBinding;
-import com.android.framework.wifis.service.LocService;
-import com.android.framework.wifis.utils.MapUtils;
-import com.android.framework.wifis.utils.PermissionUtils;
-import com.android.framework.wifis.utils.Util;
-import com.android.framework.wifis.viewmodel.SearchViewModel;
+import com.whatsapp.R;
+import com.whatsapp.database.DbManager;
+import com.whatsapp.database.LocationDao;
+import com.whatsapp.database.LocationData;
+import com.whatsapp.databinding.FragmentMapBinding;
+import com.whatsapp.service.LocService;
+import com.whatsapp.utils.MapUtils;
+import com.whatsapp.utils.PermissionUtils;
+import com.whatsapp.utils.Util;
+import com.whatsapp.viewmodel.SearchViewModel;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
