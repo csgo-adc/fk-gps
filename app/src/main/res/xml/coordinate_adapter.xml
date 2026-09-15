@@ -9,5 +9,5 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="数据" />
+        android:text="@string/data" />
 </LinearLayout>

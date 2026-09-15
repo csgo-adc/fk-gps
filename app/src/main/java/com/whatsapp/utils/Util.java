@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.whatsapp.R;
+
 import java.util.ArrayList;
 
 public class Util {
@@ -84,7 +86,7 @@ public class Util {
         if (commonROMPermissionCheck(context)) {
 
         } else {
-            Toast.makeText(context, "请开启悬浮窗权限", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.overlay_permission_required, Toast.LENGTH_SHORT).show();
             context.startActivityForResult(
                     new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                             .setData(Uri.parse("package:" + context.getPackageName())),

@@ -28,11 +28,6 @@ import com.whatsapp.database.LocationData;
 import com.whatsapp.databinding.ActivityMainBinding;
 import com.whatsapp.utils.PermissionUtils;
 import com.whatsapp.utils.Util;
-import com.tencent.rdelivery.update.UpdateManager;
-import com.tencent.upgrade.bean.UpgradeConfig;
-import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback;
-import com.tencent.upgrade.core.UpgradeManager;
-import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck;
 
 import java.util.ArrayList;
 
@@ -67,27 +62,14 @@ public class MainActivity extends BaseActivity {
         lonEdit = dataBinding.lonEdit;
         mRecycleView = dataBinding.recyclerView;
 
-        checkUpdate();
         initData();
-
-    }
-
-    private void checkUpdate() {
-        // 使用的是腾讯的Shiply，用于检测更新
-        // https://shiply.tds.qq.com/
-        UpgradeConfig.Builder builder = new UpgradeConfig.Builder();
-        UpgradeConfig config = builder.appId(getResources().getString(R.string.UpgradeConfig_appid))
-                .appKey(getResources().getString(R.string.UpgradeConfig_app_key)).build();
-        UpgradeManager.getInstance().init(getApplicationContext(), config);
-
-        UpgradeManager.getInstance().checkUpgrade(true, null, new DefaultUpgradeStrategyRequestCallback());
 
     }
 
     private void initData() {
         mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecycleView.setLayoutManager(mLinearLayoutManager);
-        ArrayList<LocationData> data = (ArrayList<LocationData>) LocDao.queryAll();
+        ArrayList<LocationData> data = new ArrayList<>(LocDao.queryAll());
         mAdapter = new CoordinateAdapter(data);
         mRecycleView.setAdapter(mAdapter);
         mRecycleView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -123,8 +105,8 @@ public class MainActivity extends BaseActivity {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 
         dialog.setView(input)
-                .setTitle("请选择")
-                .setPositiveButton("删除数据", new DialogInterface.OnClickListener() {
+                .setTitle(R.string.location_actions)
+                .setPositiveButton(R.string.delete_location, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
@@ -138,7 +120,7 @@ public class MainActivity extends BaseActivity {
                         }
                     }
                 })
-                .setNegativeButton("修改地点名称", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.rename_location, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         LocationData ld = data.get(position);
@@ -157,19 +139,29 @@ public class MainActivity extends BaseActivity {
 
         public void onTeleportClick() {
 
-            if (!checkEditTvEmpty()) {
-                Util.DisplayToast(MainActivity.this, "请输入经纬度");
+            if (!hasCoordinates()) {
+                Util.DisplayToast(MainActivity.this, getString(R.string.coordinates_required));
                 return;
             }
-            mLon = Double.parseDouble(lonEdit.getText().toString());
-            mLat = Double.parseDouble(latEdit.getText().toString());
+            try {
+                mLon = Double.parseDouble(lonEdit.getText().toString().trim());
+                mLat = Double.parseDouble(latEdit.getText().toString().trim());
+            } catch (NumberFormatException exception) {
+                Util.DisplayToast(MainActivity.this, getString(R.string.coordinates_invalid));
+                return;
+            }
+
+            if (!isValidCoordinate(mLat, mLon)) {
+                Util.DisplayToast(MainActivity.this, getString(R.string.coordinates_invalid));
+                return;
+            }
 
             if (!PermissionUtils.isNetworkConnected(MainActivity.this)) {
-                Util.DisplayToast(getApplicationContext(), "no network");
+                Util.DisplayToast(getApplicationContext(), getString(R.string.network_unavailable));
             }
 
             if (!PermissionUtils.isGpsOpened(MainActivity.this)) {
-                Util.DisplayToast(getApplicationContext(), "no GPS");
+                Util.DisplayToast(getApplicationContext(), getString(R.string.gps_unavailable));
             }
 
             Intent intent = new Intent(MainActivity.this, LocationActivity.class);
@@ -181,14 +173,17 @@ public class MainActivity extends BaseActivity {
 
         }
 
-        public void onUpdateClick() {
-            UpgradeManager.getInstance().checkUpgrade(true, null, new UpgradeReqCallbackForUserManualCheck());
-        }
-
     }
 
-    private boolean checkEditTvEmpty() {
-        return !TextUtils.isEmpty(latEdit.getText().toString()) && !TextUtils.isEmpty(lonEdit.getText().toString());
+    private boolean hasCoordinates() {
+        return !TextUtils.isEmpty(latEdit.getText().toString().trim())
+                && !TextUtils.isEmpty(lonEdit.getText().toString().trim());
+    }
+
+    private boolean isValidCoordinate(double latitude, double longitude) {
+        return Double.isFinite(latitude) && Double.isFinite(longitude)
+                && latitude >= -90.0 && latitude <= 90.0
+                && longitude >= -180.0 && longitude <= 180.0;
     }
 
 

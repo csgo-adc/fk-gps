@@ -56,7 +56,7 @@ public class WelcomeActivity extends BaseActivity {
             if (mCheckBox.isChecked()) {
                 requestPermissions();
             } else {
-                Util.DisplayToast(WelcomeActivity.this, "请勾选用户使用协议");
+                Util.DisplayToast(WelcomeActivity.this, getString(R.string.agreement_required));
             }
         }
 

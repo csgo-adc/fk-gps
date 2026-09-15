@@ -76,13 +76,19 @@ public class CoordinateAdapter extends RecyclerView.Adapter<CoordinateAdapter.Co
 
         @Override
         public void onClick(View v) {
-            mListener.onItemClick(v, getLayoutPosition());
+            int position = getBindingAdapterPosition();
+            if (mListener != null && position != RecyclerView.NO_POSITION) {
+                mListener.onItemClick(v, position);
+            }
 
         }
 
         @Override
         public boolean onLongClick(View v) {
-            mListener.onItemLongClick(v, getLayoutPosition());
+            int position = getBindingAdapterPosition();
+            if (mListener != null && position != RecyclerView.NO_POSITION) {
+                mListener.onItemLongClick(v, position);
+            }
             return true;
         }
     }

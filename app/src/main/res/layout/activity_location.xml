@@ -36,7 +36,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="在"
+                        android:text="@string/search_in_city"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
@@ -44,13 +44,13 @@
                         android:id="@+id/city"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="北京"
+                        android:text="@string/search_city_default"
                         android:textColor="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="内找"
+                        android:text="@string/search_for"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.88"
-                        android:hint="请输入联想关键字"
+                        android:hint="@string/search_hint"
                         android:singleLine="true"
                         android:textColor="@color/black_semi_transparent" />
 

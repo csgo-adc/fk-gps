@@ -501,7 +501,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
         public void onSendClick() {
             if (!PermissionUtils.isAllowMockLocation(mActivity)) {
                 PermissionUtils.showEnableMockLocationDialog(mActivity);
-                Util.DisplayToast(mActivity, "模拟位置没打开");
+                Util.DisplayToast(mActivity, getString(R.string.location_simulation_disabled));
                 return;
             }
 //            if (!PermissionUtils.isGpsOpened(mActivity)) {
@@ -510,7 +510,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
 //            }
 
             if (!PermissionUtils.isNetworkAvailable(mActivity)) {
-                Util.DisplayToast(mActivity, "network 坏了");
+                Util.DisplayToast(mActivity, getString(R.string.network_unavailable));
                 return;
             }
             if (!Settings.canDrawOverlays(mActivity.getApplicationContext())) {
@@ -575,7 +575,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
             }
         } else {
             if (mMarkLatLngMap == null) {
-                Util.DisplayToast(mActivity, "请标记地点");
+                Util.DisplayToast(mActivity, getString(R.string.mark_location_required));
                 return;
             }
 
@@ -598,7 +598,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
 
     private void savePositionData() {
 
-        String position = "未知地点";
+        String position = getString(R.string.unknown_location);
         if (!TextUtils.isEmpty(mPositionName)) {
             position = mPositionName;
         }

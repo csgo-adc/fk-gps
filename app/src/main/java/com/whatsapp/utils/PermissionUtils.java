@@ -16,6 +16,8 @@ import android.provider.Settings;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.whatsapp.R;
+
 import java.util.List;
 
 public class PermissionUtils {
@@ -135,9 +137,9 @@ public class PermissionUtils {
     //提醒开启位置模拟的弹框
     public static void showEnableMockLocationDialog(Context context) {
         new AlertDialog.Builder(context)
-                .setTitle("启用位置模拟")//这里是表头的内容
-                .setMessage("请在\"开发者选项→选择模拟位置信息应用\"中进行设置")//这里是中间显示的具体信息
-                .setPositiveButton("设置", (dialog, which) -> {
+                .setTitle(R.string.enable_mock_location)
+                .setMessage(R.string.enable_mock_location_message)
+                .setPositiveButton(R.string.settings, (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -146,7 +148,7 @@ public class PermissionUtils {
                         e.printStackTrace();
                     }
                 })
-                .setNegativeButton("取消", (dialog, which) -> {
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 })
                 .show();
     }
@@ -154,9 +156,9 @@ public class PermissionUtils {
     //提醒开启悬浮窗的弹框
     public static void showEnableFloatWindowDialog(Context context) {
         new AlertDialog.Builder(context)
-                .setTitle("启用悬浮窗")//这里是表头的内容
-                .setMessage("为了模拟定位的稳定性，建议开启\"显示悬浮窗\"选项")//这里是中间显示的具体信息
-                .setPositiveButton("设置", (dialog, which) -> {
+                .setTitle(R.string.enable_overlay)
+                .setMessage(R.string.enable_overlay_message)
+                .setPositiveButton(R.string.settings, (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -165,7 +167,7 @@ public class PermissionUtils {
                         e.printStackTrace();
                     }
                 })
-                .setNegativeButton("取消", (dialog, which) -> {
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
 
                 })
                 .show();
@@ -174,9 +176,9 @@ public class PermissionUtils {
     //显示开启GPS的提示
     public static void showEnableGpsDialog(Context context) {
         new AlertDialog.Builder(context)
-                .setTitle("启用定位服务")//这里是表头的内容
-                .setMessage("是否开启 GPS 定位服务?")//这里是中间显示的具体信息
-                .setPositiveButton("确定", (dialog, which) -> {
+                .setTitle(R.string.enable_location_services)
+                .setMessage(R.string.enable_location_services_message)
+                .setPositiveButton(R.string.settings, (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         context.startActivity(intent);
@@ -184,7 +186,7 @@ public class PermissionUtils {
                         e.printStackTrace();
                     }
                 })
-                .setNegativeButton("取消", (dialog, which) -> {
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
 
                 })
                 .show();

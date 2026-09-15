@@ -38,9 +38,9 @@
                 android:id="@+id/lon_edit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autofillHints="latitude"
-                android:hint="@string/_15_478551"
-                android:inputType="numberDecimal"
+                android:autofillHints="longitude"
+                android:hint="@string/coordinate_example"
+                android:inputType="numberDecimal|numberSigned"
                 app:layout_constraintBaseline_toBaselineOf="@id/longi"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/longi" />
@@ -59,9 +59,9 @@
                 android:id="@+id/lat_edit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autofillHints="longitude"
-                android:hint="@string/_15_478551"
-                android:inputType="numberDecimal"
+                android:autofillHints="latitude"
+                android:hint="@string/coordinate_example"
+                android:inputType="numberDecimal|numberSigned"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/lati"
                 app:layout_constraintTop_toBottomOf="@+id/lon_edit" />
@@ -128,19 +128,6 @@
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:background="@color/white_pressed"
-            android:onClick="@{()->clickListener.onUpdateClick()}"
-            android:text="@string/check_update"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
