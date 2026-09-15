@@ -40,6 +40,7 @@
     <string name="search_for">for</string>
     <string name="search_hint">Enter a place or address</string>
     <string name="send_to_position">Set location</string>
+    <string name="stop_location">Stop location</string>
     <string name="map_normal">Standard</string>
     <string name="map_satellite">Satellite</string>
     <string name="map_none">Blank</string>

@@ -100,6 +100,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
     private String mPositionName;
     private boolean isNeedMove2Location = true;
     private boolean isMockServStart = false;
+    private boolean isServiceBound = false;
     private String mCurrentCity = "nu";
     private double mCurrentLat = 0.0;       // 当前位置的百度纬度
     private double mCurrentLon = 0.0;       // 当前位置的百度经度
@@ -135,11 +136,13 @@ public class MapFragment extends Fragment implements SensorEventListener {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mServiceBinder = (LocService.ServiceBinder) service;
+                isServiceBound = true;
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-
+                mServiceBinder = null;
+                isServiceBound = false;
             }
         };
 
@@ -170,27 +173,17 @@ public class MapFragment extends Fragment implements SensorEventListener {
         initMapLocation();
 
 
-        mConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mServiceBinder = (LocService.ServiceBinder) service;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
-
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mMapView.onResume();
-        mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(this, mSensorMagnetic, SensorManager.SENSOR_DELAY_UI);
+        if (mSensorManager != null) {
+            mSensorManager.registerListener(this, mSensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+            mSensorManager.registerListener(this, mSensorMagnetic, SensorManager.SENSOR_DELAY_UI);
+        }
+        refreshMockServiceState();
     }
 
     @Override
@@ -214,7 +207,7 @@ public class MapFragment extends Fragment implements SensorEventListener {
     @Override
     public void onDestroy() {
 
-        super.onDestroy();
+        unbindFromLocationService();
         if (mLocClient != null) {
             mLocClient.stop();
         }
@@ -222,7 +215,10 @@ public class MapFragment extends Fragment implements SensorEventListener {
         mMapView.onDestroy();
         mMapView = null;
         mSearch.destroy();
-        mSensorManager.unregisterListener(this);
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(this);
+        }
+        super.onDestroy();
     }
 
     private void initMap() {
@@ -499,6 +495,10 @@ public class MapFragment extends Fragment implements SensorEventListener {
         }
 
         public void onSendClick() {
+            if (isMockServStart) {
+                stopGoLocation();
+                return;
+            }
             if (!PermissionUtils.isAllowMockLocation(mActivity)) {
                 PermissionUtils.showEnableMockLocationDialog(mActivity);
                 Util.DisplayToast(mActivity, getString(R.string.location_simulation_disabled));
@@ -519,9 +519,6 @@ public class MapFragment extends Fragment implements SensorEventListener {
             }
 
             startGoLocation();
-            mDataBinding.sendToPosition.setVisibility(View.GONE);
-
-
         }
 
         public void onSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -546,20 +543,18 @@ public class MapFragment extends Fragment implements SensorEventListener {
 
 
     private void stopGoLocation() {
-        mActivity.unbindService(mConnection);
         Intent intent = new Intent(mActivity, LocService.class);
+        unbindFromLocationService();
         mActivity.stopService(intent);
         isMockServStart = false;
+        updateActionButton();
     }
 
 
     private void startGoLocation() {
 
         if (isMockServStart) {
-
-            if (mMarkLatLngMap == null) {
-                stopGoLocation();
-            } else {
+            if (mMarkLatLngMap != null && mServiceBinder != null) {
                 double[] latLng = MapUtils.bd2wgs(mMarkLatLngMap.longitude, mMarkLatLngMap.latitude);
 
                 mServiceBinder.setPosition(latLng[0], latLng[1], mAltitude);
@@ -585,14 +580,37 @@ public class MapFragment extends Fragment implements SensorEventListener {
             intent.putExtra(MainActivity.LAT_VALUE, latLng[1]);
             intent.putExtra(MainActivity.ALT_VALUE, mAltitude);
 
-            mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);    // 绑定服务和活动，之后活动就可以去调服务的方法了
-
             savePositionData();
-
             mActivity.startForegroundService(intent);
+            mActivity.startForegroundService(intent);
+            mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             isMockServStart = true;
             mMarkLatLngMap = null;
             mBaiduMap.clear();
+            updateActionButton();
+        }
+    }
+
+    private void refreshMockServiceState() {
+        isMockServStart = Util.isServiceRunning(requireContext(), LocService.class.getName());
+        if (isMockServStart && !isServiceBound) {
+            mActivity.bindService(new Intent(mActivity, LocService.class), mConnection, Context.BIND_AUTO_CREATE);
+        }
+        updateActionButton();
+    }
+
+    private void unbindFromLocationService() {
+        if (isServiceBound) {
+            mActivity.unbindService(mConnection);
+            isServiceBound = false;
+            mServiceBinder = null;
+        }
+    }
+
+    private void updateActionButton() {
+        if (mDataBinding != null) {
+            mDataBinding.sendToPosition.setText(isMockServStart
+                    ? R.string.stop_location : R.string.send_to_position);
         }
     }
 

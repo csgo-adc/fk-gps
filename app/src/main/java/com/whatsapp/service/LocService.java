@@ -42,6 +42,7 @@ import com.whatsapp.ui.MainActivity;
 
 public class LocService extends Service {
     private static final int SERVICE_ID = 1;
+    public static final String ACTION_STOP = "com.csgoadc.locationassistant.action.STOP";
 
     private WindowManager mWindowManager;
     private View floatingView;
@@ -58,7 +59,7 @@ public class LocService extends Service {
     private LocationManager mLocManager;
     private HandlerThread mLocHandlerThread;
     private final ServiceBinder mBinder = new ServiceBinder();
-    private final boolean isStop = false;
+    private boolean isStopped;
     private static final String SERVICE_GO_NOTE_CHANNEL_ID = "SERVICE_GO_NOTE";
     private static final String SERVICE_GO_NOTE_CHANNEL_NAME = "SERVICE_GO_NOTE";
 
@@ -82,20 +83,34 @@ public class LocService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
         if (intent != null) {
             mCurLon = intent.getDoubleExtra(MainActivity.LON_VALUE, 40.070754);
             mCurLat = intent.getDoubleExtra(MainActivity.LAT_VALUE, 116.324175);
             mCurAlt = intent.getDoubleExtra(MainActivity.ALT_VALUE, 250.0);
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        isStopped = true;
+        if (mLocHandler != null) {
+            mLocHandler.removeCallbacksAndMessages(null);
+        }
+        if (mLocHandlerThread != null) {
+            mLocHandlerThread.quitSafely();
+        }
         super.onDestroy();
-        if (floatingView != null) {
+        if (floatingView != null && floatingView.isAttachedToWindow()) {
             mWindowManager.removeView(floatingView);
         }
+        removeTestProviderNetwork();
+        removeTestProviderGPS();
+        stopForeground(STOP_FOREGROUND_REMOVE);
     }
 
     @Nullable
@@ -151,7 +166,7 @@ public class LocService extends Service {
                 try {
                     Thread.sleep(100);
 
-                    if (!isStop) {
+                    if (!isStopped) {
                         setLocationNetwork();
                         setLocationGPS();
 
@@ -250,9 +265,11 @@ public class LocService extends Service {
 
         }
 
-        //准备intent
+        // Open the app from the ongoing notification.
         Intent clickIntent = new Intent(this, MainActivity.class);
         PendingIntent clickPI = PendingIntent.getActivity(this, 1, clickIntent, PendingIntent.FLAG_IMMUTABLE);
+        Intent stopIntent = new Intent(this, LocService.class).setAction(ACTION_STOP);
+        PendingIntent stopPI = PendingIntent.getService(this, 2, stopIntent, PendingIntent.FLAG_IMMUTABLE);
 
 
         Notification notification = new NotificationCompat.Builder(this, SERVICE_GO_NOTE_CHANNEL_ID)
@@ -261,6 +278,9 @@ public class LocService extends Service {
                 .setContentText(getResources().getString(R.string.mocking))
                 .setContentIntent(clickPI)
                 .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel,
+                        getString(R.string.stop_location), stopPI)
                 .build();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -289,7 +309,7 @@ public class LocService extends Service {
         floatingView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                stopSelf();
             }
         });
         floatingView.setOnTouchListener(new View.OnTouchListener() {//给悬浮窗设置触摸监听、用来处理拖动事件，实现悬浮窗拖动时改变悬浮窗位置
